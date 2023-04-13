@@ -1,0 +1,176 @@
+:root {
+	--mainColor: #472726;
+	--secColor: #583b3a;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	font-family: sans-serif;
+}
+
+body {
+	background: var(--secColor);
+	color: white;
+}
+
+main {
+	margin-top: 100px;
+	width: 100vw;
+	height: 50vh;
+}
+
+header {
+	width: 100vw;
+	background-color: var(--mainColor);
+	padding: 20px 0;
+	text-align: center;
+}
+
+.container {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	flex-direction: column;
+	justify-content: space-between;
+	text-align: center;
+}
+
+.list-container {
+	width: 70%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 0 auto;
+}
+
+.list {
+	margin-top: 30px;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	row-gap: 20px;
+}
+
+.list-item {
+	background: var(--mainColor);
+	padding: 20px 10px;
+	width: 100%;
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	justify-content: space-between;
+	align-items: center;
+	border-radius: 10px;
+}
+
+.list-header {
+	overflow: hidden;
+	cursor: pointer;
+}
+.delete-button {
+	cursor: pointer;
+	margin: 0 auto;
+}
+
+.edit-button {
+	cursor: pointer;
+	margin: 0 auto;
+}
+
+.create-item-wrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	place-items: center;
+}
+
+.create-item-wrapper input[type="text"] {
+	background-color: transparent;
+	padding: 20px;
+	border: 2px solid var(--mainColor);
+	border-bottom-left-radius: 2rem;
+	border-top-left-radius: 2rem;
+	color: white;
+}
+
+.create-item {
+	padding: 20px;
+	background-color: var(--mainColor);
+	border: 2px solid var(--mainColor);
+	border-top-right-radius: 2rem;
+	border-bottom-right-radius: 2rem;
+}
+
+.create-item-wrapper input[type="text"]:focus {
+	outline: none;
+}
+
+.fa-plus {
+	color: white;
+}
+
+.edit {
+	display: none;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: 30%;
+	height: 300px;
+}
+
+.fa-x {
+	padding-left: auto;
+	cursor: pointer;
+}
+.edit-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	background: var(--mainColor);
+	border-radius: 20px;
+}
+.edit-form {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+}
+
+.edit-inner-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 50px;
+}
+
+.edit-button-submit {
+	all: unset;
+	background: var(--secColor);
+	font-size: 1.5rem;
+	padding: 10px 70px;
+	border-radius: 9999px;
+	outline: white 1px solid;
+	cursor: pointer;
+}
+
+input[name="item_input_edit"] {
+	padding: 10px 20px;
+	background: transparent;
+	border: none;
+	border-radius: 9999px;
+	box-shadow: 0px 0px 5px black;
+	color: white;
+}
+
+input[name="item_input_edit"]:focus {
+	outline: none;
+}
+
+@media only screen and (max-width: 800px) {
+	.list-container {
+		width: 90%;
+	}
+}
