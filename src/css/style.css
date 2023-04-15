@@ -8,6 +8,7 @@
 	padding: 0;
 	box-sizing: border-box;
 	font-family: sans-serif;
+	overflow: hidden;
 }
 
 body {
@@ -16,7 +17,7 @@ body {
 }
 
 main {
-	margin-top: 100px;
+	margin-top: 40px;
 	width: 100vw;
 	height: 50vh;
 }
@@ -81,25 +82,26 @@ header {
 .create-item-wrapper {
 	display: flex;
 	justify-content: center;
+	flex-direction: column;
 	align-items: center;
 	place-items: center;
+	gap: 10px;
 }
 
 .create-item-wrapper input[type="text"] {
 	background-color: transparent;
 	padding: 20px;
 	border: 2px solid var(--mainColor);
-	border-bottom-left-radius: 2rem;
-	border-top-left-radius: 2rem;
 	color: white;
+	border-radius: 20px;
 }
 
 .create-item {
-	padding: 20px;
+	cursor: pointer;
+	padding: 20px 50px;
 	background-color: var(--mainColor);
 	border: 2px solid var(--mainColor);
-	border-top-right-radius: 2rem;
-	border-bottom-right-radius: 2rem;
+	border-radius: 20px;
 }
 
 .create-item-wrapper input[type="text"]:focus {
@@ -109,9 +111,9 @@ header {
 .fa-plus {
 	color: white;
 }
-
-.edit {
+.edit-popup {
 	display: none;
+
 	position: absolute;
 	left: 50%;
 	top: 50%;
@@ -120,18 +122,51 @@ header {
 	height: 300px;
 }
 
+.info-popup{
+	display: none;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-45%, -50%);
+	width: 100%;
+	height: 50%;
+}
+
+.info-container{
+	display: grid;
+	height: 100%;
+	width: 100%;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: 1fr 1fr;
+	
+}
+
+.info-item{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	gap: 20px;
+}
+
 .fa-x {
 	padding-left: auto;
 	cursor: pointer;
 }
 .edit-container {
-	display: flex;
-	justify-content: center;
-	align-items: center;
+
 	height: 100%;
 	background: var(--mainColor);
 	border-radius: 20px;
 }
+
+.info-container{
+
+	width: 90%;
+	height: 100%;
+	background:	var(--mainColor);
+}
+
 .edit-form {
 	display: flex;
 	justify-content: center;
@@ -156,7 +191,7 @@ header {
 	cursor: pointer;
 }
 
-input[name="item_input_edit"] {
+input[name="header_input_edit"] {
 	padding: 10px 20px;
 	background: transparent;
 	border: none;
@@ -165,7 +200,7 @@ input[name="item_input_edit"] {
 	color: white;
 }
 
-input[name="item_input_edit"]:focus {
+input[name="header_input_edit"]:focus {
 	outline: none;
 }
 

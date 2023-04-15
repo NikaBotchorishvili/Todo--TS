@@ -1,41 +1,71 @@
 type ListItem = {
 	id: number;
+	title: string;
+	description: string;
 	completed: boolean;
-	body: string;
+	date: Date;
 };
 
 const createItemButton = document.querySelector(".create-item") as HTMLElement;
-const inputElement = document.getElementById("input") as HTMLInputElement;
+const headerInputElement = document.querySelector(
+	"input[name=header_input]"
+) as HTMLInputElement;
+const descriptionInputElement = document.querySelector(
+	"input[name=description_input]"
+) as HTMLInputElement;
+
 const list = document.querySelector(".list") as HTMLUListElement;
 
-const xCloseEdit = document.querySelector(".fa-x") as HTMLElement;
-const editForm = document.querySelector(".edit") as HTMLElement;
+const editForm = document.querySelector(".edit-popup") as HTMLElement;
 const editInput = document.querySelector(
 	"input[name=item_input_edit]"
 ) as HTMLInputElement;
 const editButtonElement = document.querySelector(
 	".edit-button-submit"
 ) as HTMLButtonElement;
+const closeEdit = document.querySelector(".close-edit") as HTMLElement;
+
+const closeInfo = document.querySelector(".close-info") as HTMLElement;
+const infoPopup = document.querySelector(".info-popup") as HTMLElement;
+
+const infoTitle = document.querySelector(".title") as HTMLElement;
+const infoDescription = document.querySelector(".description") as HTMLElement;
+const infoProgress = document.querySelector(".progress") as HTMLElement;
+const infoDate = document.querySelector(".date") as HTMLElement;
+
 let listArray: ListItem[] = [];
 let counter: number = 1;
 
 init();
 
-createItemButton?.addEventListener("click", () => {
-	let inputValue = inputElement.value;
-	if (inputValue != "" && inputValue.trim().length != 0) {
-		let todoInfo = createItemElement(counter, inputValue, false);
+createItemButton?.addEventListener("click", (e) => {
+	e.preventDefault();
+	let date = new Date();
+	let headerInputValue = headerInputElement.value.trim();
+	let descriptionInputValue = descriptionInputElement.value.trim();
+	if (
+		headerInputValue != "" &&
+		headerInputValue.trim().length != 0 &&
+		descriptionInputValue != "" &&
+		descriptionInputValue.trim().length != 0
+	) {
+		let todoInfo = createItemElement(counter, headerInputValue, descriptionInputValue, false, date);
 
 		listArray.push(todoInfo);
 		window.localStorage.setItem("list", JSON.stringify(listArray));
-		inputElement.value = "";
+		headerInputElement.value = "";
+		descriptionInputElement.value = "";
 
 		counter++;
 	}
 });
 
-xCloseEdit.addEventListener("click", () => {
+closeEdit.addEventListener("click", () => {
 	editForm.style.display = "none";
+});
+
+closeInfo.addEventListener("click", () => {
+	infoPopup.style.display = "none";
 });
 
 editButtonElement.addEventListener("click", (e) => {
@@ -56,16 +86,18 @@ editButtonElement.addEventListener("click", (e) => {
 
 function createItemElement(
 	id: number,
-	inputValue: string,
-	completed: boolean
+	header: string,
+	description: string,
+	completed: boolean,
+	date: Date,
 ): ListItem {
 	const listItem = document.createElement("li");
-	const item = document.createElement("h2");
+	const listHeader = document.createElement("h2");
 	const editButton = document.createElement("i");
 	const deleteButton = document.createElement("i");
 	const checkBox = document.createElement("input");
 
-	item.classList.add("list-header");
+	listHeader.classList.add("list-header");
 
 	checkBox.classList.add("completed-checkbox");
 	checkBox.type = "checkbox";
@@ -84,47 +116,74 @@ function createItemElement(
 
 	listItem.classList.add("list-item");
 	listItem.appendChild(checkBox);
-	listItem.appendChild(item);
+	listItem.appendChild(listHeader);
 	listItem.appendChild(editButton);
 	listItem.appendChild(deleteButton);
 
-	item.innerHTML = inputValue.trim();
+	listHeader.innerHTML = header.trim();
 	list.appendChild(listItem);
 
-	checkBox.addEventListener("change", () => {
-		listArray = listArray.map((item) => {
-			if (item.id == id) {
-				return { ...item, completed: !item.completed };
-			}
-			return item;
-		});
+	listHeader.addEventListener("click", () => listHeaderClickHandler(id));
 
-		localStorage.setItem("list", JSON.stringify(listArray));
-	});
+	checkBox.addEventListener("change", () => checkBoxHandler(id));
+	editButton.addEventListener("click", () => editButtonHandler(id));
+	deleteButton.addEventListener("click", () =>
+		deleteButtonHandler(deleteButton)
+	);
 
-	editButton.addEventListener("click", () => {
-		const item = listArray.find((item) => item.id == id);
-
-		if (item) {
-			editInput.value = item.body;
-			editInput.dataset.id = id.toString();
-			editForm.style.display = "block";
-		}
-	});
-
-	deleteButton.addEventListener("click", () => {
-		let dataSetId = editButton.dataset.id;
-		listArray = listArray.filter((item: ListItem) => {
-			return item.id != Number(dataSetId);
-		});
-
-		window.localStorage.setItem("list", JSON.stringify(listArray));
-		update();
-	});
-
-	return { id: counter, body: inputValue, completed: checkBox.checked };
+	return {
+		id: counter,
+		title: header,
+		completed: checkBox.checked,
+		description: description,
+		date: date
+	};
 }
 
+// 	EVENT HANDLER FUNCTIONS
+
+function listHeaderClickHandler(id: number) {
+	let listItem = listArray.find((item) => item.id == id);
+	if (listItem) {
+		infoTitle.innerText = listItem.title;
+		infoDescription.innerText = listItem.description;
+
+		infoProgress.innerText = listItem.completed? "Completed": "Not Completed";
+		infoPopup.style.display = "block";
+	}
+}
+
+function checkBoxHandler(id: number) {
+	listArray = listArray.map((item) => {
+		if (item.id == id) {
+			return { ...item, completed: !item.completed };
+		}
+		return item;
+	});
+
+	localStorage.setItem("list", JSON.stringify(listArray));
+}
+
+function editButtonHandler(id: number) {
+	const item = listArray.find((item) => item.id == id);
+
+	if (item) {
+		editInput.value = item.title;
+		editInput.dataset.id = id.toString();
+		editForm.style.display = "block";
+	}
+}
+
+function deleteButtonHandler(editButton: HTMLElement) {
+	let dataSetId = editButton.dataset.id;
+	listArray = listArray.filter((item: ListItem) => {
+		return item.id != Number(dataSetId);
+	});
+
+	window.localStorage.setItem("list", JSON.stringify(listArray));
+	update();
+}
+const date = new Date()
 function init() {
 	if (!window.localStorage.getItem("list")) {
 		window.localStorage.setItem("list", "");
@@ -137,7 +196,7 @@ function init() {
 			counter = temporaryListArray.slice(-1)[0].id + 1;
 			listArray = temporaryListArray;
 			temporaryListArray.forEach((element: ListItem) => {
-				createItemElement(element.id, element.body, element.completed);
+				createItemElement(element.id, element.title, element.description, element.completed, element.date);
 			});
 		}
 	}
@@ -151,7 +210,7 @@ function update() {
 	if (temporaryListArray.length > 0) {
 		counter = temporaryListArray.slice(-1)[0].id + 1;
 		temporaryListArray.forEach((element: ListItem) => {
-			createItemElement(element.id, element.body, element.completed);
+			createItemElement(element.id, element.title, element.description, element.completed, element.date);
 		});
 	}
 }

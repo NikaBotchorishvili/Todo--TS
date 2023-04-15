@@ -19,22 +19,25 @@
 		<main>
 			<div class="container">
 				<div class="list-container">
-					<div class="create-item-wrapper">
-						<input type="text" name="item_input" id="input" />
+					<form class="create-item-wrapper">
+						<input type="text" name="header_input" placeholder="Enter todo" />
+						<input type="text" name="description_input" placeholder="Enter todo description">
 						<button class="create-item">
 							<i class="fa-solid fa-plus"></i>
 						</button>
-					</div>
+					</form>
 					<ul class="list"></ul>
 				</div>
 			</div>
 		</main>
-		<section class="edit">
-			<i class="fa-solid fa-x"></i>
+
+
+		<section class="edit-popup">
+			<i class="fa-solid fa-x close-edit"></i>
 			<div class="edit-container">
 				<div class="edit-form">
 					<div class="edit-inner-container">
-						<input type="text" name="item_input_edit" />
+						<input type="text" name="header_input" />
 
 						<button class="edit-button-submit">Submit</button>
 					</div>
@@ -42,6 +45,31 @@
 			</div>
 		</section>
 
+		<section class="info-popup">
+			<i class="fa-solid fa-x close-info"></i>
+			<div class="info-container">
+				<div class="info-item">
+					<h1>Title:</h1>
+					<h4 class="title"></h4>
+				</div>
+				<div class="info-item">
+					<h1>Description:</h1>
+					<h4 class="description"></h4>
+
+				</div>
+				<div class="info-item">
+					<h1>Progress:</h1>
+					<h4 class="progress"></h4>
+
+
+				</div>
+				<div class="info-item">
+					<h1>Date added:</h1>
+					<h4 class="date"></h4>
+
+				</div>
+			</div>
+		</section>
 		<footer>
 			<script src="./src/js/index.js"></script>
 		</footer>
