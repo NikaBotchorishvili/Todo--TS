@@ -10,13 +10,63 @@
 		></script>
 
 		<link rel="stylesheet" href="./src/css/style.css" />
+		<link rel="stylesheet" href="./src/css/toggles.css" />
 		<title>Document</title>
 	</head>
 	<body>
 		<header>
-			<h1>To do</h1>
+			<div class="header-container">
+				<i class="fa-solid fa-bars"></i>
+				<h1>To do</h1>
+			</div>
 		</header>
-		<main>
+
+		<aside class="sidebar">
+			<div class="sidebar-container">
+				<div class="lists">
+					<div class="lists-create">
+						<h1>Lists</h1>
+						<div class="lists-actions">
+							<i
+								class="fa-solid fa-plus open-create-popup"
+								aria-label="Add List"
+							></i>
+							<i class="fa-solid fa-angle-left"></i>
+						</div>
+					</div>
+					<ul class="lists-list"></ul>
+				</div>
+			</div>
+		</aside>
+
+		<div class="popup create-popup">
+			<h1>Add list</h1>
+			<form class="create-item-wrapper">
+				<div class="input-group">
+					<label for="header_input">Name</label>
+					<input type="text" name="header_input" />
+				</div>
+				<div class="input-group">
+					<label for="description_input">Description</label>
+
+					<textarea
+						class="textarea"
+						name="description_input"
+						id=""
+						cols="30"
+						rows="8"
+					></textarea>
+				</div>
+
+				<div class="input-group buttons">
+					<div class="button cancel">Cancel</div>
+
+					<button class="button create-list">Add</button>
+				</div>
+			</form>
+		</div>
+
+		<!-- <main>
 			<div class="container">
 				<div class="list-container">
 					<form class="create-item-wrapper">
@@ -29,16 +79,22 @@
 					<ul class="list"></ul>
 				</div>
 			</div>
-		</main>
+		</main> -->
 
-
-		<section class="edit-popup">
+		<!-- <section class="edit-popup">
 			<i class="fa-solid fa-x close-edit"></i>
 			<div class="edit-container">
 				<div class="edit-form">
 					<div class="edit-inner-container">
 						<input type="text" name="item_input_edit" />
-						<textarea class="textarea" name="description_edit_input" placeholder="Enter todo description" id="" cols="30" rows="10"></textarea>
+						<textarea
+							class="textarea"
+							name="description_edit_input"
+							placeholder="Enter todo description"
+							id=""
+							cols="30"
+							rows="10"
+						></textarea>
 						<button class="edit-button-submit">Submit</button>
 					</div>
 				</div>
@@ -55,21 +111,19 @@
 				<div class="info-item">
 					<h1>Description:</h1>
 					<h4 class="description"></h4>
-
 				</div>
 				<div class="info-item">
 					<h1>Progress:</h1>
 					<h4 class="progress"></h4>
-
-
 				</div>
 				<div class="info-item">
 					<h1>Date added:</h1>
 					<h4 class="date"></h4>
-
 				</div>
 			</div>
-		</section>
+		</section> -->
+
+		<div class="overlay"></div>
 		<footer>
 			<script src="./src/js/index.js"></script>
 		</footer>

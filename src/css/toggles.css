@@ -1,0 +1,29 @@
+.show{
+	display: block;
+}
+
+.fa-angle-left {
+	cursor: pointer;
+	rotate: -90deg;
+	transition: 0.2s ease-in-out;
+}
+.fa-circle {
+	scale: 0.5;
+}
+
+.fa-plus {
+	cursor: pointer;
+}
+
+.hide {
+	transform: translateX(-100%);
+}
+
+.fade {
+	opacity: 0;
+	transform: translateY(-50%);
+}
+.rotate {
+	rotate: 0deg;
+}
+

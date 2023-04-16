@@ -1,69 +1,65 @@
-type ListItem = {
+type List = {
 	id: number;
 	title: string;
 	description: string;
-	completed: boolean;
 	date: Date;
 };
 
-const createItemButton = document.querySelector(".create-item") as HTMLElement;
+// 	Overlay for blurring
+const overlayElement = document.querySelector(".overlay") as HTMLElement;
+
+const listsList = document.querySelector(".lists-list") as HTMLElement;
+
+const createItemPopupButtonElement = document.querySelector(
+	".open-create-popup"
+) as HTMLElement;
+const createPopupElement = document.querySelector(
+	".create-popup"
+) as HTMLElement;
+const createListButton = document.querySelector(".create-list");
+const cancelListCreateElement = document.querySelector(
+	".cancel"
+) as HTMLElement;
+
 const headerInputElement = document.querySelector(
 	"input[name=header_input]"
 ) as HTMLInputElement;
 const descriptionInputElement = document.querySelector(
-	"input[name=description_input]"
+	"textarea[name=description_input]"
 ) as HTMLInputElement;
 
-const list = document.querySelector(".list") as HTMLUListElement;
+const asideElement = document.querySelector("aside");
+const menuElement = document.querySelector(".fa-bars") as HTMLElement;
 
-const editForm = document.querySelector(".edit-popup") as HTMLElement;
-const headerEditInput = document.querySelector(
-	"input[name=item_input_edit]"
-) as HTMLInputElement;
-const descriptionEditInput = document.querySelector(
-	"textarea[name=description_edit_input]"
-) as HTMLTextAreaElement;
+const listsArrowElement = document.querySelector(
+	".fa-angle-left"
+) as HTMLElement;
+const listsListElement = document.querySelector(".lists-list") as HTMLElement;
 
-const editButtonElement = document.querySelector(
-	".edit-button-submit"
-) as HTMLButtonElement;
-const closeEdit = document.querySelector(".close-edit") as HTMLElement;
+listsArrowElement.addEventListener("click", () => {
+	listsArrowElement.classList.toggle("rotate");
+	listsListElement.classList.toggle("fade");
+});
 
-const closeInfo = document.querySelector(".close-info") as HTMLElement;
-const infoPopup = document.querySelector(".info-popup") as HTMLElement;
+menuElement.addEventListener("click", () => {
+	asideElement.classList.toggle("hide");
+});
 
-const infoTitle = document.querySelector(".title") as HTMLElement;
-const infoDescription = document.querySelector(".description") as HTMLElement;
-const infoProgress = document.querySelector(".progress") as HTMLElement;
-const infoDate = document.querySelector(".date") as HTMLElement;
-
-let listArray: ListItem[] = [];
+let listArray: List[] = [];
 let counter: number = 1;
 
 init();
 
-function calculateTimeSince(timestamp: number) {
-	const timeElapsed = Date.now() - timestamp;
+createItemPopupButtonElement.addEventListener("click", () => {
+	createPopupElement.classList.toggle("show");
+	overlayElement.classList.toggle("show");
+});
 
-	const days = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
-	const hours = Math.floor((timeElapsed / (1000 * 60 * 60)) % 24);
-	const minutes = Math.floor((timeElapsed / 1000 / 60) % 60);
-	const seconds = Math.floor((timeElapsed / 1000) % 60);
+cancelListCreateElement.addEventListener("click", () => {
+	exitPopup();
+});
 
-	if (days > 1) {
-		return `${days} days ago`;
-	} else if (hours > 1) {
-		return `${hours} hours ago`;
-	} else if (minutes > 1) {
-		return `${minutes} minutes ago`;
-	} else if (seconds > 1) {
-		return `${seconds} seconds ago`;
-	} else {
-		return "now";
-	}
-}
-
-createItemButton?.addEventListener("click", (e) => {
+createListButton?.addEventListener("click", (e) => {
 	e.preventDefault();
 	let date = new Date();
 	let headerInputValue = headerInputElement.value.trim();
@@ -74,11 +70,10 @@ createItemButton?.addEventListener("click", (e) => {
 		descriptionInputValue != "" &&
 		descriptionInputValue.trim().length != 0
 	) {
-		let todoInfo = createItemElement(
+		let todoInfo = createListElement(
 			counter,
 			headerInputValue,
 			descriptionInputValue,
-			false,
 			date
 		);
 
@@ -86,164 +81,156 @@ createItemButton?.addEventListener("click", (e) => {
 		window.localStorage.setItem("list", JSON.stringify(listArray));
 		headerInputElement.value = "";
 		descriptionInputElement.value = "";
-
+		exitPopup();
 		counter++;
 	}
 });
 
-closeEdit.addEventListener("click", () => {
-	editForm.style.display = "none";
-});
-
-closeInfo.addEventListener("click", () => {
-	infoPopup.style.display = "none";
-});
-
-editButtonElement.addEventListener("click", (e) => {
-	e.preventDefault();
-	let dataSetId = headerEditInput.dataset.id;
-	if (headerEditInput.value != "" && descriptionEditInput.value != "") {
-		listArray = listArray.map((item) => {
-			if (item.id == Number(dataSetId)) {
-				return {
-					...item,
-					body: headerEditInput.value,
-					description: descriptionEditInput.value,
-				};
-			}
-			return item;
-		});
-		window.localStorage.setItem("list", JSON.stringify(listArray));
-		update();
-		editForm.style.display = "none";
-	}
-});
-
-function createItemElement(
+function createListElement(
 	id: number,
 	header: string,
 	description: string,
-	completed: boolean,
 	date: Date
-): ListItem {
-	const listItem = document.createElement("li");
-	const listHeader = document.createElement("h2");
-	const editButton = document.createElement("i");
-	const deleteButton = document.createElement("i");
-	const checkBox = document.createElement("input");
+): List {
+	const itemContainer = document.createElement("li");
+	const listCircle = document.createElement("i");
+	const listHeader = document.createElement("h4");;
 
-	listHeader.classList.add("list-header");
+	listHeader.innerText = header;
+	listHeader.setAttribute("data-list-id", id.toString());
 
-	checkBox.classList.add("completed-checkbox");
-	checkBox.type = "checkbox";
-	checkBox.checked = completed;
-	checkBox.setAttribute("data-id", id.toString());
+	listCircle.classList.add("fa-solid");
+	listCircle.classList.add("fa-circle");
 
-	deleteButton.classList.add("fa-solid");
-	deleteButton.classList.add("fa-trash-can");
-	deleteButton.classList.add("delete-button");
-	deleteButton.setAttribute("data-id", id.toString());
+	itemContainer.appendChild(listCircle);
+	itemContainer.appendChild(listHeader);
 
-	editButton.classList.add("fa-pen-to-square");
-	editButton.classList.add("fa-solid");
-	editButton.classList.add("edit-button");
-	editButton.setAttribute("data-id", id.toString());
-
-	listItem.classList.add("list-item");
-	listItem.appendChild(checkBox);
-	listItem.appendChild(listHeader);
-	listItem.appendChild(editButton);
-	listItem.appendChild(deleteButton);
-
-	listHeader.innerHTML = header.trim();
-	list.appendChild(listItem);
-
-	listHeader.addEventListener("click", () => listHeaderClickHandler(id));
-
-	checkBox.addEventListener("change", () => checkBoxHandler(id));
-	editButton.addEventListener("click", () => editButtonHandler(id));
-	deleteButton.addEventListener("click", () =>
-		deleteButtonHandler(deleteButton)
-	);
-
+	listsList.appendChild(itemContainer);
 	return {
 		id: counter,
 		title: header,
-		completed: checkBox.checked,
 		description: description,
 		date: date,
 	};
 }
 
-// 	EVENT HANDLER FUNCTIONS
+// function calculateTimeSince(timestamp: number) {
+// 	const timeElapsed = Date.now() - timestamp;
 
-function listHeaderClickHandler(id: number) {
-	let listItem = listArray.find((item) => item.id == id);
-	if (listItem) {
-		infoTitle.innerText = listItem.title;
-		infoDescription.innerText = listItem.description;
+// 	const days = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
+// 	const hours = Math.floor((timeElapsed / (1000 * 60 * 60)) % 24);
+// 	const minutes = Math.floor((timeElapsed / 1000 / 60) % 60);
+// 	const seconds = Math.floor((timeElapsed / 1000) % 60);
 
-		infoProgress.innerText = listItem.completed
-			? "Completed"
-			: "Not Completed";
+// 	if (days > 1) {
+// 		return `${days} days ago`;
+// 	} else if (hours > 1) {
+// 		return `${hours} hours ago`;
+// 	} else if (minutes > 1) {
+// 		return `${minutes} minutes ago`;
+// 	} else if (seconds > 1) {
+// 		return `${seconds} seconds ago`;
+// 	} else {
+// 		return "now";
+// 	}
+// }
 
-		infoDate.innerText = calculateTimeSince(
-			new Date(listItem.date).getTime()
-		);
+// closeEdit.addEventListener("click", () => {
+// 	editForm.style.display = "none";
+// });
 
-		infoPopup.style.display = "block";
-	}
-}
+// closeInfo.addEventListener("click", () => {
+// 	infoPopup.style.display = "none";
+// });
 
-function checkBoxHandler(id: number) {
-	listArray = listArray.map((item) => {
-		if (item.id == id) {
-			return { ...item, completed: !item.completed };
-		}
-		return item;
-	});
+// editButtonElement.addEventListener("click", (e) => {
+// 	e.preventDefault();
+// 	let dataSetId = headerEditInput.dataset.id;
+// 	if (headerEditInput.value != "" && descriptionEditInput.value != "") {
+// 		listArray = listArray.map((item) => {
+// 			if (item.id == Number(dataSetId)) {
+// 				return {
+// 					...item,
+// 					body: headerEditInput.value,
+// 					description: descriptionEditInput.value,
+// 				};
+// 			}
+// 			return item;
+// 		});
+// 		window.localStorage.setItem("list", JSON.stringify(listArray));
+// 		update();
+// 		editForm.style.display = "none";
+// 	}
+// });
 
-	localStorage.setItem("list", JSON.stringify(listArray));
-}
+// // 	EVENT HANDLER FUNCTIONS
 
-function editButtonHandler(id: number) {
-	const item = listArray.find((item) => item.id == id);
+// function listHeaderClickHandler(id: number) {
+// 	let listItem = listArray.find((item) => item.id == id);
+// 	if (listItem) {
+// 		infoTitle.innerText = listItem.title;
+// 		infoDescription.innerText = listItem.description;
 
-	if (item) {
-		headerEditInput.value = item.title;
-		descriptionEditInput.value = item.description;
-		headerEditInput.dataset.id = id.toString();
-		editForm.style.display = "block";
-	}
-}
+// 		infoProgress.innerText = listItem.completed
+// 			? "Completed"
+// 			: "Not Completed";
 
-function deleteButtonHandler(editButton: HTMLElement) {
-	let dataSetId = editButton.dataset.id;
-	listArray = listArray.filter((item: ListItem) => {
-		return item.id != Number(dataSetId);
-	});
+// 		infoDate.innerText = calculateTimeSince(
+// 			new Date(listItem.date).getTime()
+// 		);
 
-	window.localStorage.setItem("list", JSON.stringify(listArray));
-	update();
-}
+// 		infoPopup.style.display = "block";
+// 	}
+// }
+
+// function checkBoxHandler(id: number) {
+// 	listArray = listArray.map((item) => {
+// 		if (item.id == id) {
+// 			return { ...item, completed: !item.completed };
+// 		}
+// 		return item;
+// 	});
+
+// 	localStorage.setItem("list", JSON.stringify(listArray));
+// }
+
+// function editButtonHandler(id: number) {
+// 	const item = listArray.find((item) => item.id == id);
+
+// 	if (item) {
+// 		headerEditInput.value = item.title;
+// 		descriptionEditInput.value = item.description;
+// 		headerEditInput.dataset.id = id.toString();
+// 		editForm.style.display = "block";
+// 	}
+// }
+
+// function deleteButtonHandler(editButton: HTMLElement) {
+// 	let dataSetId = editButton.dataset.id;
+// 	listArray = listArray.filter((item: ListItem) => {
+// 		return item.id != Number(dataSetId);
+// 	});
+
+// 	window.localStorage.setItem("list", JSON.stringify(listArray));
+// 	update();
+// }
 
 function init() {
 	if (!window.localStorage.getItem("list")) {
 		window.localStorage.setItem("list", "");
 	} else {
-		const temporaryListArray: ListItem[] = JSON.parse(
+		const temporaryListArray: List[] = JSON.parse(
 			window.localStorage.getItem("list") || ""
 		);
 
 		if (temporaryListArray.length > 0) {
 			counter = temporaryListArray.slice(-1)[0].id + 1;
 			listArray = temporaryListArray;
-			temporaryListArray.forEach((element: ListItem) => {
-				createItemElement(
+			temporaryListArray.forEach((element: List) => {
+				createListElement(
 					element.id,
 					element.title,
 					element.description,
-					element.completed,
 					element.date
 				);
 			});
@@ -251,21 +238,25 @@ function init() {
 	}
 }
 
-function update() {
-	const temporaryListArray: ListItem[] = JSON.parse(
-		window.localStorage.getItem("list") || ""
-	);
-	list.innerHTML = "";
-	if (temporaryListArray.length > 0) {
-		counter = temporaryListArray.slice(-1)[0].id + 1;
-		temporaryListArray.forEach((element: ListItem) => {
-			createItemElement(
-				element.id,
-				element.title,
-				element.description,
-				element.completed,
-				element.date
-			);
-		});
-	}
+// function update() {
+// 	const temporaryListArray: ListItem[] = JSON.parse(
+// 		window.localStorage.getItem("list") || ""
+// 	);
+// 	list.innerHTML = "";
+// 	if (temporaryListArray.length > 0) {
+// 		counter = temporaryListArray.slice(-1)[0].id + 1;
+// 		temporaryListArray.forEach((element: ListItem) => {
+// 			createItemElement(
+// 				element.id,
+// 				element.title,
+// 				element.description,
+// 				element.completed,
+// 				element.date
+// 			);
+// 		});
+// 	}
+// }
+function exitPopup(): void {
+	createPopupElement.classList.remove("show");
+	overlayElement.classList.remove("show");
 }
