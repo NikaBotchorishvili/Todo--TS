@@ -17,9 +17,13 @@ const descriptionInputElement = document.querySelector(
 const list = document.querySelector(".list") as HTMLUListElement;
 
 const editForm = document.querySelector(".edit-popup") as HTMLElement;
-const editInput = document.querySelector(
+const headerEditInput = document.querySelector(
 	"input[name=item_input_edit]"
 ) as HTMLInputElement;
+const descriptionEditInput = document.querySelector(
+	"textarea[name=description_edit_input]"
+) as HTMLTextAreaElement;
+
 const editButtonElement = document.querySelector(
 	".edit-button-submit"
 ) as HTMLButtonElement;
@@ -38,6 +42,27 @@ let counter: number = 1;
 
 init();
 
+function calculateTimeSince(timestamp: number) {
+	const timeElapsed = Date.now() - timestamp;
+
+	const days = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
+	const hours = Math.floor((timeElapsed / (1000 * 60 * 60)) % 24);
+	const minutes = Math.floor((timeElapsed / 1000 / 60) % 60);
+	const seconds = Math.floor((timeElapsed / 1000) % 60);
+
+	if (days > 1) {
+		return `${days} days ago`;
+	} else if (hours > 1) {
+		return `${hours} hours ago`;
+	} else if (minutes > 1) {
+		return `${minutes} minutes ago`;
+	} else if (seconds > 1) {
+		return `${seconds} seconds ago`;
+	} else {
+		return "now";
+	}
+}
+
 createItemButton?.addEventListener("click", (e) => {
 	e.preventDefault();
 	let date = new Date();
@@ -49,7 +74,13 @@ createItemButton?.addEventListener("click", (e) => {
 		descriptionInputValue != "" &&
 		descriptionInputValue.trim().length != 0
 	) {
-		let todoInfo = createItemElement(counter, headerInputValue, descriptionInputValue, false, date);
+		let todoInfo = createItemElement(
+			counter,
+			headerInputValue,
+			descriptionInputValue,
+			false,
+			date
+		);
 
 		listArray.push(todoInfo);
 		window.localStorage.setItem("list", JSON.stringify(listArray));
@@ -70,11 +101,15 @@ closeInfo.addEventListener("click", () => {
 
 editButtonElement.addEventListener("click", (e) => {
 	e.preventDefault();
-	let dataSetId = editInput.dataset.id;
-	if (editInput.value != "") {
+	let dataSetId = headerEditInput.dataset.id;
+	if (headerEditInput.value != "" && descriptionEditInput.value != "") {
 		listArray = listArray.map((item) => {
 			if (item.id == Number(dataSetId)) {
-				return { ...item, body: editInput.value };
+				return {
+					...item,
+					body: headerEditInput.value,
+					description: descriptionEditInput.value,
+				};
 			}
 			return item;
 		});
@@ -89,7 +124,7 @@ function createItemElement(
 	header: string,
 	description: string,
 	completed: boolean,
-	date: Date,
+	date: Date
 ): ListItem {
 	const listItem = document.createElement("li");
 	const listHeader = document.createElement("h2");
@@ -136,7 +171,7 @@ function createItemElement(
 		title: header,
 		completed: checkBox.checked,
 		description: description,
-		date: date
+		date: date,
 	};
 }
 
@@ -148,7 +183,14 @@ function listHeaderClickHandler(id: number) {
 		infoTitle.innerText = listItem.title;
 		infoDescription.innerText = listItem.description;
 
-		infoProgress.innerText = listItem.completed? "Completed": "Not Completed";
+		infoProgress.innerText = listItem.completed
+			? "Completed"
+			: "Not Completed";
+
+		infoDate.innerText = calculateTimeSince(
+			new Date(listItem.date).getTime()
+		);
+
 		infoPopup.style.display = "block";
 	}
 }
@@ -168,8 +210,9 @@ function editButtonHandler(id: number) {
 	const item = listArray.find((item) => item.id == id);
 
 	if (item) {
-		editInput.value = item.title;
-		editInput.dataset.id = id.toString();
+		headerEditInput.value = item.title;
+		descriptionEditInput.value = item.description;
+		headerEditInput.dataset.id = id.toString();
 		editForm.style.display = "block";
 	}
 }
@@ -183,7 +226,7 @@ function deleteButtonHandler(editButton: HTMLElement) {
 	window.localStorage.setItem("list", JSON.stringify(listArray));
 	update();
 }
-const date = new Date()
+
 function init() {
 	if (!window.localStorage.getItem("list")) {
 		window.localStorage.setItem("list", "");
@@ -196,7 +239,13 @@ function init() {
 			counter = temporaryListArray.slice(-1)[0].id + 1;
 			listArray = temporaryListArray;
 			temporaryListArray.forEach((element: ListItem) => {
-				createItemElement(element.id, element.title, element.description, element.completed, element.date);
+				createItemElement(
+					element.id,
+					element.title,
+					element.description,
+					element.completed,
+					element.date
+				);
 			});
 		}
 	}
@@ -210,7 +259,13 @@ function update() {
 	if (temporaryListArray.length > 0) {
 		counter = temporaryListArray.slice(-1)[0].id + 1;
 		temporaryListArray.forEach((element: ListItem) => {
-			createItemElement(element.id, element.title, element.description, element.completed, element.date);
+			createItemElement(
+				element.id,
+				element.title,
+				element.description,
+				element.completed,
+				element.date
+			);
 		});
 	}
 }

@@ -3,7 +3,8 @@ const headerInputElement = document.querySelector("input[name=header_input]");
 const descriptionInputElement = document.querySelector("input[name=description_input]");
 const list = document.querySelector(".list");
 const editForm = document.querySelector(".edit-popup");
-const editInput = document.querySelector("input[name=item_input_edit]");
+const headerEditInput = document.querySelector("input[name=item_input_edit]");
+const descriptionEditInput = document.querySelector("textarea[name=description_edit_input]");
 const editButtonElement = document.querySelector(".edit-button-submit");
 const closeEdit = document.querySelector(".close-edit");
 const closeInfo = document.querySelector(".close-info");
@@ -15,6 +16,28 @@ const infoDate = document.querySelector(".date");
 let listArray = [];
 let counter = 1;
 init();
+function calculateTimeSince(timestamp) {
+    const timeElapsed = Date.now() - timestamp;
+    const days = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeElapsed / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((timeElapsed / 1000 / 60) % 60);
+    const seconds = Math.floor((timeElapsed / 1000) % 60);
+    if (days > 1) {
+        return `${days} days ago`;
+    }
+    else if (hours > 1) {
+        return `${hours} hours ago`;
+    }
+    else if (minutes > 1) {
+        return `${minutes} minutes ago`;
+    }
+    else if (seconds > 1) {
+        return `${seconds} seconds ago`;
+    }
+    else {
+        return "now";
+    }
+}
 createItemButton === null || createItemButton === void 0 ? void 0 : createItemButton.addEventListener("click", (e) => {
     e.preventDefault();
     let date = new Date();
@@ -40,11 +63,11 @@ closeInfo.addEventListener("click", () => {
 });
 editButtonElement.addEventListener("click", (e) => {
     e.preventDefault();
-    let dataSetId = editInput.dataset.id;
-    if (editInput.value != "") {
+    let dataSetId = headerEditInput.dataset.id;
+    if (headerEditInput.value != "" && descriptionEditInput.value != "") {
         listArray = listArray.map((item) => {
             if (item.id == Number(dataSetId)) {
-                return Object.assign(Object.assign({}, item), { body: editInput.value });
+                return Object.assign(Object.assign({}, item), { body: headerEditInput.value, description: descriptionEditInput.value });
             }
             return item;
         });
@@ -88,7 +111,7 @@ function createItemElement(id, header, description, completed, date) {
         title: header,
         completed: checkBox.checked,
         description: description,
-        date: date
+        date: date,
     };
 }
 function listHeaderClickHandler(id) {
@@ -96,7 +119,10 @@ function listHeaderClickHandler(id) {
     if (listItem) {
         infoTitle.innerText = listItem.title;
         infoDescription.innerText = listItem.description;
-        infoProgress.innerText = listItem.completed ? "Completed" : "Not Completed";
+        infoProgress.innerText = listItem.completed
+            ? "Completed"
+            : "Not Completed";
+        infoDate.innerText = calculateTimeSince(new Date(listItem.date).getTime());
         infoPopup.style.display = "block";
     }
 }
@@ -112,8 +138,9 @@ function checkBoxHandler(id) {
 function editButtonHandler(id) {
     const item = listArray.find((item) => item.id == id);
     if (item) {
-        editInput.value = item.title;
-        editInput.dataset.id = id.toString();
+        headerEditInput.value = item.title;
+        descriptionEditInput.value = item.description;
+        headerEditInput.dataset.id = id.toString();
         editForm.style.display = "block";
     }
 }
@@ -125,7 +152,6 @@ function deleteButtonHandler(editButton) {
     window.localStorage.setItem("list", JSON.stringify(listArray));
     update();
 }
-const date = new Date();
 function init() {
     if (!window.localStorage.getItem("list")) {
         window.localStorage.setItem("list", "");
