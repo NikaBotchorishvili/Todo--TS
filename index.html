@@ -11,33 +11,37 @@
 
 		<link rel="stylesheet" href="./src/css/style.css" />
 		<link rel="stylesheet" href="./src/css/toggles.css" />
+		<link rel="stylesheet" href="./src/css/oneLiners.css" />
 		<title>Document</title>
 	</head>
 	<body>
-		<header>
-			<div class="header-container">
-				<i class="fa-solid fa-bars"></i>
-				<h1>To do</h1>
-			</div>
-		</header>
-
-		<aside class="sidebar">
-			<div class="sidebar-container">
-				<div class="lists">
-					<div class="lists-create">
-						<h1>Lists</h1>
-						<div class="lists-actions">
-							<i
-								class="fa-solid fa-plus open-create-popup"
-								aria-label="Add List"
-							></i>
-							<i class="fa-solid fa-angle-left"></i>
+		<div class="container">
+			<header>
+				<div class="header-container">
+					<i class="fa-solid fa-bars"></i>
+					<h1>To do</h1>
+				</div>
+			</header>
+			<main>
+				<aside class="sidebar">
+					<div class="sidebar-container">
+						<div class="lists">
+							<div class="lists-create">
+								<h1>Lists</h1>
+								<div class="lists-actions">
+									<i
+										class="fa-solid fa-plus open-create-popup"
+										aria-label="Add List"
+									></i>
+									<i class="fa-solid fa-angle-left"></i>
+								</div>
+							</div>
+							<ul class="lists-list"></ul>
 						</div>
 					</div>
-					<ul class="lists-list"></ul>
-				</div>
-			</div>
-		</aside>
+				</aside>
+			</main>
+		</div>
 
 		<div class="popup create-popup">
 			<h1>Add list</h1>
@@ -65,64 +69,6 @@
 				</div>
 			</form>
 		</div>
-
-		<!-- <main>
-			<div class="container">
-				<div class="list-container">
-					<form class="create-item-wrapper">
-						<input type="text" name="header_input" placeholder="Enter todo" />
-						<textarea class="textarea" name="description_input" placeholder="Enter todo description" id="" cols="30" rows="10"></textarea>
-						<button class="create-item">
-							<i class="fa-solid fa-plus"></i>
-						</button>
-					</form>
-					<ul class="list"></ul>
-				</div>
-			</div>
-		</main> -->
-
-		<!-- <section class="edit-popup">
-			<i class="fa-solid fa-x close-edit"></i>
-			<div class="edit-container">
-				<div class="edit-form">
-					<div class="edit-inner-container">
-						<input type="text" name="item_input_edit" />
-						<textarea
-							class="textarea"
-							name="description_edit_input"
-							placeholder="Enter todo description"
-							id=""
-							cols="30"
-							rows="10"
-						></textarea>
-						<button class="edit-button-submit">Submit</button>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<section class="info-popup">
-			<i class="fa-solid fa-x close-info"></i>
-			<div class="info-container">
-				<div class="info-item">
-					<h1>Title:</h1>
-					<h4 class="title"></h4>
-				</div>
-				<div class="info-item">
-					<h1>Description:</h1>
-					<h4 class="description"></h4>
-				</div>
-				<div class="info-item">
-					<h1>Progress:</h1>
-					<h4 class="progress"></h4>
-				</div>
-				<div class="info-item">
-					<h1>Date added:</h1>
-					<h4 class="date"></h4>
-				</div>
-			</div>
-		</section> -->
-
 		<div class="overlay"></div>
 		<footer>
 			<script src="./src/js/index.js"></script>

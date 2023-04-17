@@ -1,0 +1,29 @@
+.delete {
+	cursor: pointer;
+}
+
+.archive {
+	cursor: pointer;
+}
+.duplicate {
+	cursor: pointer;
+}
+.edit {
+	cursor: pointer;
+}
+.favorite {
+	cursor: pointer;
+}
+
+.rotate {
+	rotate: 0deg;
+}
+
+
+.fa-circle {
+	scale: 0.5;
+}
+
+.fa-plus {
+	cursor: pointer;
+}

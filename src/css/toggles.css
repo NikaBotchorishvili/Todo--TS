@@ -7,23 +7,22 @@
 	rotate: -90deg;
 	transition: 0.2s ease-in-out;
 }
-.fa-circle {
-	scale: 0.5;
-}
 
-.fa-plus {
-	cursor: pointer;
-}
-
-.hide {
+.slide {
 	transform: translateX(-100%);
 }
 
-.fade {
-	opacity: 0;
-	transform: translateY(-50%);
-}
-.rotate {
-	rotate: 0deg;
+.fa-ellipsis{
+	scale: 1.4;
+	cursor: pointer;
+	padding: 5px;
 }
 
+.fade {
+	opacity: 0.2;
+	transform: translateY(-150%);
+}
+
+.hide{
+	display: none;
+}

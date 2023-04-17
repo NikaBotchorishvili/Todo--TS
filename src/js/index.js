@@ -15,7 +15,7 @@ listsArrowElement.addEventListener("click", () => {
     listsListElement.classList.toggle("fade");
 });
 menuElement.addEventListener("click", () => {
-    asideElement.classList.toggle("hide");
+    asideElement.classList.toggle("slide");
 });
 let listArray = [];
 let counter = 1;
@@ -49,20 +49,59 @@ function createListElement(id, header, description, date) {
     const itemContainer = document.createElement("li");
     const listCircle = document.createElement("i");
     const listHeader = document.createElement("h4");
-    ;
     listHeader.innerText = header;
     listHeader.setAttribute("data-list-id", id.toString());
     listCircle.classList.add("fa-solid");
     listCircle.classList.add("fa-circle");
-    itemContainer.appendChild(listCircle);
-    itemContainer.appendChild(listHeader);
+    itemContainer.append(listCircle, listHeader);
     listsList.appendChild(itemContainer);
+    const itemRect = itemContainer.getBoundingClientRect();
+    const dropdown = dropDownActionList(id, itemRect);
+    itemContainer.append(dropdown.dropDownButton, dropdown.dropdown);
     return {
         id: counter,
         title: header,
         description: description,
         date: date,
     };
+}
+function dropDownActionList(id, itemRect) {
+    const iconClasses = [
+        { name: "Edit List", classes: ["fa-solid", "fa-pen-to-square"] },
+        { name: "Favorite List", classes: ["fa-regular", "fa-heart"] },
+        { name: "Duplicate List", classes: ["fa-solid", "fa-clone"] },
+        { name: "Archive List", classes: ["fa-solid", "fa-box-archive"] },
+        { name: "Delete List", classes: ["fa-solid", "fa-trash"] },
+    ];
+    const dropdown = document.createElement("div");
+    const dropdownButton = document.createElement("div");
+    const ellipsisElement = document.createElement("i");
+    const actionMenuElement = document.createElement("ul");
+    const menuRect = ellipsisElement.getBoundingClientRect();
+    actionMenuElement.classList.add("action-menu");
+    ellipsisElement.classList.add("fa-solid", "fa-ellipsis");
+    dropdownButton.classList.add("dropdown-button");
+    dropdownButton.appendChild(ellipsisElement);
+    dropdown.classList.add("dropdown", "hide");
+    dropdownButton.addEventListener("click", () => {
+        dropdown.classList.toggle("hide");
+    });
+    iconClasses.forEach((icon) => {
+        const liElement = document.createElement("li");
+        const iconElement = document.createElement("i");
+        const headerElement = document.createElement("small");
+        liElement.classList.add("action-menu-item");
+        iconElement.classList.add(...icon.classes);
+        headerElement.innerText = icon.name;
+        liElement.append(iconElement, headerElement);
+        actionMenuElement.append(liElement);
+    });
+    dropdown.style.top = `${itemRect.top}px`;
+    dropdown.style.left = `${itemRect.right + 30}px`;
+    console.log(itemRect);
+    dropdown.append(actionMenuElement);
+    dropdown.setAttribute("data-id", id.toString());
+    return { dropDownButton: dropdownButton, dropdown: dropdown };
 }
 function init() {
     if (!window.localStorage.getItem("list")) {

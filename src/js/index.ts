@@ -42,7 +42,7 @@ listsArrowElement.addEventListener("click", () => {
 });
 
 menuElement.addEventListener("click", () => {
-	asideElement.classList.toggle("hide");
+	asideElement.classList.toggle("slide");
 });
 
 let listArray: List[] = [];
@@ -94,18 +94,20 @@ function createListElement(
 ): List {
 	const itemContainer = document.createElement("li");
 	const listCircle = document.createElement("i");
-	const listHeader = document.createElement("h4");;
+	const listHeader = document.createElement("h4");
 
 	listHeader.innerText = header;
 	listHeader.setAttribute("data-list-id", id.toString());
-
 	listCircle.classList.add("fa-solid");
 	listCircle.classList.add("fa-circle");
 
-	itemContainer.appendChild(listCircle);
-	itemContainer.appendChild(listHeader);
+	itemContainer.append(listCircle, listHeader);
 
 	listsList.appendChild(itemContainer);
+	const itemRect = itemContainer.getBoundingClientRect();
+	const dropdown = dropDownActionList(id, itemRect);
+
+	itemContainer.append(dropdown.dropDownButton, dropdown.dropdown);
 	return {
 		id: counter,
 		title: header,
@@ -114,106 +116,65 @@ function createListElement(
 	};
 }
 
-// function calculateTimeSince(timestamp: number) {
-// 	const timeElapsed = Date.now() - timestamp;
+function dropDownActionList(id: number, itemRect: DOMRect) {
+	const iconClasses = [
+		{ name: "Edit List", classes: ["fa-solid", "fa-pen-to-square"] },
+		{ name: "Favorite List", classes: ["fa-regular", "fa-heart"] },
+		{ name: "Duplicate List", classes: ["fa-solid", "fa-clone"] },
+		{ name: "Archive List", classes: ["fa-solid", "fa-box-archive"] },
+		{ name: "Delete List", classes: ["fa-solid", "fa-trash"] },
+	];
+	const dropdown = document.createElement("div");
+	const dropdownButton = document.createElement("div");
+	const ellipsisElement = document.createElement("i");
+	const actionMenuElement = document.createElement("ul");
 
-// 	const days = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
-// 	const hours = Math.floor((timeElapsed / (1000 * 60 * 60)) % 24);
-// 	const minutes = Math.floor((timeElapsed / 1000 / 60) % 60);
-// 	const seconds = Math.floor((timeElapsed / 1000) % 60);
+	actionMenuElement.classList.add("action-menu");
+	ellipsisElement.classList.add("fa-solid", "fa-ellipsis");
+	dropdownButton.classList.add("dropdown-button");
+	dropdownButton.appendChild(ellipsisElement);
 
-// 	if (days > 1) {
-// 		return `${days} days ago`;
-// 	} else if (hours > 1) {
-// 		return `${hours} hours ago`;
-// 	} else if (minutes > 1) {
-// 		return `${minutes} minutes ago`;
-// 	} else if (seconds > 1) {
-// 		return `${seconds} seconds ago`;
-// 	} else {
-// 		return "now";
-// 	}
-// }
+	dropdown.classList.add("dropdown", "hide");
+	dropdownButton.addEventListener("click", () => {
+		dropdown.classList.toggle("hide");
+	});
+	iconClasses.forEach((icon) => {
+		const liElement = document.createElement("li");
+		const iconElement = document.createElement("i");
+		const headerElement = document.createElement("small");
 
-// closeEdit.addEventListener("click", () => {
-// 	editForm.style.display = "none";
-// });
+		liElement.classList.add("action-menu-item")
+		iconElement.classList.add(...icon.classes);
+		headerElement.innerText = icon.name;
+		liElement.append(iconElement, headerElement)
 
-// closeInfo.addEventListener("click", () => {
-// 	infoPopup.style.display = "none";
-// });
+		actionMenuElement.append(liElement);
+	});
+	dropdown.style.top = `${itemRect.top}px`;
+	dropdown.style.left = `${itemRect.right + 30}px`
+	dropdown.append(actionMenuElement);
+	dropdown.setAttribute("data-id", id.toString());
+	return { dropDownButton: dropdownButton, dropdown: dropdown };
+}
 
-// editButtonElement.addEventListener("click", (e) => {
-// 	e.preventDefault();
-// 	let dataSetId = headerEditInput.dataset.id;
-// 	if (headerEditInput.value != "" && descriptionEditInput.value != "") {
-// 		listArray = listArray.map((item) => {
-// 			if (item.id == Number(dataSetId)) {
-// 				return {
-// 					...item,
-// 					body: headerEditInput.value,
-// 					description: descriptionEditInput.value,
-// 				};
-// 			}
-// 			return item;
-// 		});
-// 		window.localStorage.setItem("list", JSON.stringify(listArray));
-// 		update();
-// 		editForm.style.display = "none";
-// 	}
-// });
+function calculateTimeSince(timestamp: number) {
+	const timeElapsed = Date.now() - timestamp;
 
-// // 	EVENT HANDLER FUNCTIONS
+	const days = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
+	const hours = Math.floor((timeElapsed / (1000 * 60 * 60)) % 24);
+	const minutes = Math.floor((timeElapsed / 1000 / 60) % 60);
+	const seconds = Math.floor((timeElapsed / 1000) % 60);
 
-// function listHeaderClickHandler(id: number) {
-// 	let listItem = listArray.find((item) => item.id == id);
-// 	if (listItem) {
-// 		infoTitle.innerText = listItem.title;
-// 		infoDescription.innerText = listItem.description;
-
-// 		infoProgress.innerText = listItem.completed
-// 			? "Completed"
-// 			: "Not Completed";
-
-// 		infoDate.innerText = calculateTimeSince(
-// 			new Date(listItem.date).getTime()
-// 		);
-
-// 		infoPopup.style.display = "block";
-// 	}
-// }
-
-// function checkBoxHandler(id: number) {
-// 	listArray = listArray.map((item) => {
-// 		if (item.id == id) {
-// 			return { ...item, completed: !item.completed };
-// 		}
-// 		return item;
-// 	});
-
-// 	localStorage.setItem("list", JSON.stringify(listArray));
-// }
-
-// function editButtonHandler(id: number) {
-// 	const item = listArray.find((item) => item.id == id);
-
-// 	if (item) {
-// 		headerEditInput.value = item.title;
-// 		descriptionEditInput.value = item.description;
-// 		headerEditInput.dataset.id = id.toString();
-// 		editForm.style.display = "block";
-// 	}
-// }
-
-// function deleteButtonHandler(editButton: HTMLElement) {
-// 	let dataSetId = editButton.dataset.id;
-// 	listArray = listArray.filter((item: ListItem) => {
-// 		return item.id != Number(dataSetId);
-// 	});
-
-// 	window.localStorage.setItem("list", JSON.stringify(listArray));
-// 	update();
-// }
+	if (days > 1) {
+		return `${days} days ago`;
+	} else if (hours > 1) {
+		return `${minutes} minutes ago`;
+	} else if (seconds > 1) {
+		return `${seconds} seconds ago`;
+	} else {
+		return "now";
+	}
+}
 
 function init() {
 	if (!window.localStorage.getItem("list")) {
