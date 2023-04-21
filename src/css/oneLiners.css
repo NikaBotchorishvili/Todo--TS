@@ -1,3 +1,6 @@
+textarea{
+	resize: none;
+}
 .delete {
 	cursor: pointer;
 }
@@ -19,11 +22,26 @@
 	rotate: 0deg;
 }
 
-
+.fa-heart{
+	cursor: pointer;
+}
 .fa-circle {
-	scale: 0.5;
+	scale: 0.4;
 }
 
 .fa-plus {
 	cursor: pointer;
 }
+
+.fa-ellipsis{
+	scale: 1.1;
+	cursor: pointer;
+	padding: 5px;
+}
+
+.cancel{
+	cursor: pointer;
+	box-shadow: 0 0 2px;
+}
+
+

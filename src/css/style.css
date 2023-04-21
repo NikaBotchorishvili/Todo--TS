@@ -1,8 +1,7 @@
-:root{
+:root {
 	--mainColor: brown;
+	--secColor: #808080;
 }
-
-
 
 * {
 	margin: 0;
@@ -12,7 +11,8 @@
 	overflow-x: hidden;
 }
 
-html, body{
+html,
+body {
 	height: 100%;
 }
 
@@ -20,21 +20,20 @@ body {
 	color: black;
 }
 
-
-.container{
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+.container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
 }
-main{
-    overflow: hidden;
-    display: flex;
+main {
+	overflow: hidden;
+	display: flex;
 	height: 100vh;
 }
 
 header {
 	background-color: var(--mainColor);
-	height: 90px;	
+	height: 90px;
 	color: white;
 }
 
@@ -51,18 +50,20 @@ header {
 	cursor: pointer;
 }
 
-
 .sidebar {
 	height: 100%;
 	width: 200px;
 	box-shadow: 0px 0px 3px;
 	transition: transform 0.3s ease-out;
+	color: var(--secColor)
 }
 
 .sidebar-container {
 	display: flex;
-	justify-content: center;
+	flex-direction: column;
+	align-items: center;
 	margin-top: 10px;
+	gap: 40px;
 }
 
 .lists {
@@ -70,6 +71,7 @@ header {
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
+	margin-top: 40px;
 }
 
 .lists-actions {
@@ -102,8 +104,8 @@ header {
 	display: flex;
 	width: 90%;
 	justify-content: space-between;
+	align-items: center;
 }
-
 
 .popup {
 	width: 30vw;
@@ -112,13 +114,17 @@ header {
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	transform: translate(-20%, -50%);
+	transform: translate(-50%, -50%);
 	padding: 40px;
 	z-index: 3;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 	border-radius: 20px;
 }
 
 .overlay {
+	display: none;
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -127,15 +133,16 @@ header {
 	background-color: rgba(0, 0, 0, 0.3);
 	filter: blur(1000px);
 	z-index: 1;
-	display: none;
 }
-.create-popup{
+.create-popup {
+	width: 500px;
+	height: 450px;
 	display: none;
 	justify-content: space-between;
 	flex-direction: column;
 }
 
-.create-item-wrapper {
+.form-wrapper {
 	display: flex;
 	flex-direction: column;
 	justify-content: left;
@@ -143,70 +150,112 @@ header {
 	gap: 10px;
 }
 
-.create-item-wrapper input[name=header_input]{
+.form-wrapper input[name="header_input"] {
 	resize: none;
 	border-radius: 10px;
 	border: 1px solid black;
 	padding: 10px 20px;
 }
-.create-item-wrapper textarea[name=description_input]{
+.form-wrapper textarea[name="description_input"] {
 	resize: none;
 	border-radius: 10px;
 	border: 1px solid black;
 	padding: 10px;
 }
 
-.input-group{
+.input-group {
 	display: flex;
 	flex-direction: column;
 	gap: 5px;
 }
-.buttons{
+.buttons {
 	flex-direction: row;
 	gap: 10px;
 }
-.create-item{
+.create-item {
 	width: 130px;
 	padding: 5px 30px;
 }
 
-.button{
+.button {
 	width: 130px;
 	padding: 5px 30px;
 	border-radius: 10px;
 	border: none;
 }
 
-.create-list{
+.submit-button {
 	background-color: var(--mainColor);
 	color: white;
 }
 
-.cancel{
-	cursor: pointer;
-}
-
-.dropdown{
+.dropdown {
 	position: absolute;
 	width: 145px;
 }
 
-.action-menu{
+.action-menu {
 	display: flex;
 	flex-direction: column;
-	gap: 3px;
+	gap: 1px;
 }
 
-.action-menu-item{
+.action-menu-item {
 	list-style: none;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	padding: 5px 7px;
-	gap: 5px;
 	border-top: 1px solid black;
+	cursor: pointer;
 }
 
-.action-menu-item:last-child{
+.action-menu-item:last-child {
 	border-bottom: 1px solid black;
 }
+
+.delete-popup {
+	width: 400px;
+	height: 250px;
+	display: none;
+
+	gap: 30px;
+}
+
+.edit-popup{
+	display: none;
+	width: 400px;
+	height: 450px;
+}
+
+.delete-list {
+	background-color: var(--mainColor);
+}
+
+.favorites{
+	width: 100%;
+}
+
+.favorites-header{
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	margin-bottom: 20px;
+}
+
+.favorites-list{
+	display: flex;
+	width: 100%;
+	flex-direction: column;
+	align-items: center;
+	gap: 20px;
+	transition: 0.2s ease-in-out;
+
+}
+
+.list-favorite-element{
+	display: flex;
+	width: 90%;
+	justify-content: space-between;
+}
+

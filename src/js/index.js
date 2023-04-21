@@ -1,30 +1,39 @@
 const overlayElement = document.querySelector(".overlay");
 const listsList = document.querySelector(".lists-list");
+const favoritesList = document.querySelector(".favorites-list");
 const createItemPopupButtonElement = document.querySelector(".open-create-popup");
 const createPopupElement = document.querySelector(".create-popup");
 const createListButton = document.querySelector(".create-list");
-const cancelListCreateElement = document.querySelector(".cancel");
+const cancelListCreateElement = document.querySelector(".create-cancel");
 const headerInputElement = document.querySelector("input[name=header_input]");
 const descriptionInputElement = document.querySelector("textarea[name=description_input]");
 const asideElement = document.querySelector("aside");
 const menuElement = document.querySelector(".fa-bars");
-const listsArrowElement = document.querySelector(".fa-angle-left");
-const listsListElement = document.querySelector(".lists-list");
-listsArrowElement.addEventListener("click", () => {
-    listsArrowElement.classList.toggle("rotate");
-    listsListElement.classList.toggle("fade");
-});
-menuElement.addEventListener("click", () => {
-    asideElement.classList.toggle("slide");
-});
+const expandList = document.querySelector(".expand-list");
+const expandFavorites = document.querySelector(".expand-favorites");
+const dropDownElement = document.querySelector(".dropdown");
+const editButtonElement = document.querySelector(".edit");
+const editPopupElement = document.querySelector(".edit-popup");
+const editHeaderInputElement = document.querySelector("input[name=edit_header_input]");
+const editDescriptionInput = document.querySelector("textarea[name=edit_description_input]");
+const editCancelButton = document.querySelector(".edit-cancel");
+const editSubmitButton = document.querySelector(".edit-list");
+const favoriteButtonElement = document.querySelector(".favorite");
+const duplicateButtonElement = document.querySelector(".duplicate");
+const deleteButtonElement = document.querySelector(".delete");
+const deleteSubmitButtonElement = document.querySelector(".delete-list");
+const deletePopupElement = document.querySelector(".delete-popup");
+const deleteCancelElement = document.querySelector(".delete-cancel");
+let lastToggledDropDown = 0;
 let listArray = [];
 let counter = 1;
 init();
 createItemPopupButtonElement.addEventListener("click", () => {
-    createPopupElement.classList.toggle("show");
-    overlayElement.classList.toggle("show");
+    createPopupElement.classList.add("show");
+    enterPopup();
 });
 cancelListCreateElement.addEventListener("click", () => {
+    createPopupElement.classList.remove("show");
     exitPopup();
 });
 createListButton === null || createListButton === void 0 ? void 0 : createListButton.addEventListener("click", (e) => {
@@ -32,76 +41,209 @@ createListButton === null || createListButton === void 0 ? void 0 : createListBu
     let date = new Date();
     let headerInputValue = headerInputElement.value.trim();
     let descriptionInputValue = descriptionInputElement.value.trim();
-    if (headerInputValue != "" &&
-        headerInputValue.trim().length != 0 &&
-        descriptionInputValue != "" &&
-        descriptionInputValue.trim().length != 0) {
-        let todoInfo = createListElement(counter, headerInputValue, descriptionInputValue, date);
+    if (headerInputValue != "" && descriptionInputValue != "") {
+        let todoInfo = createListElement(counter, headerInputValue, descriptionInputValue, date, false);
         listArray.push(todoInfo);
-        window.localStorage.setItem("list", JSON.stringify(listArray));
+        preUpdate();
         headerInputElement.value = "";
         descriptionInputElement.value = "";
+        createPopupElement.classList.remove("show");
         exitPopup();
         counter++;
     }
 });
-function createListElement(id, header, description, date) {
+editButtonElement.addEventListener("click", () => {
+    let id = dropDownElement.dataset.id;
+    editPopupElement.classList.add("show");
+    let item = listArray.filter((listItem) => listItem.id == Number(id))[0];
+    editHeaderInputElement.value = item.title;
+    editDescriptionInput.value = item.description;
+    enterPopup();
+});
+editCancelButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    exitPopup();
+    hideDropDown();
+    editPopupElement.classList.remove("show");
+});
+editSubmitButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    if (editHeaderInputElement.value.trim() != "" &&
+        editDescriptionInput.value.trim() != "") {
+        let id = dropDownElement.dataset.id;
+        listArray = listArray.map((item) => {
+            if (item.id == Number(id)) {
+                return Object.assign(Object.assign({}, item), { title: editHeaderInputElement.value, description: editDescriptionInput.value });
+            }
+            return item;
+        });
+        editDescriptionInput.value = "";
+        editDescriptionInput.value = "";
+        preUpdate();
+        exitPopup();
+        editPopupElement.classList.remove("show");
+        init();
+    }
+});
+favoriteButtonElement.addEventListener("click", () => {
+    let id = dropDownElement.dataset.id;
+    let dropdownFavorite = document.querySelector(".dropdown-favorite");
+    listArray = listArray.map((listItem) => {
+        if (listItem.id == Number(id)) {
+            return Object.assign(Object.assign({}, listItem), { favorite: !listItem.favorite });
+        }
+        return listItem;
+    });
+    let isFavorite = listArray.filter((item) => item.id == Number(id))[0]
+        .favorite;
+    if (isFavorite) {
+        dropdownFavorite.classList.add("fill");
+    }
+    else {
+        dropdownFavorite.classList.remove("fill");
+    }
+    preUpdate();
+    init();
+});
+duplicateButtonElement.addEventListener("click", () => {
+    let date = new Date();
+    let id = dropDownElement.dataset.id;
+    let item = listArray.filter((list) => list.id == Number(id))[0];
+    counter++;
+    let duplicateInfo = createListElement(counter, item.title, item.description, date, item.favorite);
+    listArray.push(duplicateInfo);
+    preUpdate();
+});
+deleteButtonElement.addEventListener("click", () => {
+    deletePopupElement.classList.add("show");
+    enterPopup();
+});
+deleteSubmitButtonElement.addEventListener("click", (e) => {
+    e.preventDefault();
+    let id = dropDownElement.dataset.id;
+    listArray = listArray.filter((listItem) => listItem.id != Number(id));
+    exitPopup();
+    deletePopupElement.classList.remove("show");
+    preUpdate();
+    init();
+    hideDropDown();
+});
+deleteCancelElement.addEventListener("click", (e) => {
+    e.preventDefault();
+    deletePopupElement.classList.remove("show");
+    exitPopup();
+});
+expandList.addEventListener("click", () => {
+    expandList.classList.toggle("rotate");
+    listsList.classList.toggle("fade");
+});
+expandFavorites.addEventListener("click", () => {
+    expandFavorites.classList.toggle("rotate");
+    favoritesList.classList.toggle("fade");
+});
+menuElement.addEventListener("click", () => {
+    asideElement.classList.toggle("slide");
+});
+function createListElement(id, header, description, date, favorite) {
     const itemContainer = document.createElement("li");
     const listCircle = document.createElement("i");
     const listHeader = document.createElement("h4");
+    const openDropDownButtonElement = document.createElement("i");
+    openDropDownButtonElement.classList.add("fa-solid", "fa-ellipsis");
+    openDropDownButtonElement.setAttribute("data-id", id.toString());
+    itemContainer.classList.add("lists-list-element");
     listHeader.innerText = header;
     listHeader.setAttribute("data-list-id", id.toString());
-    listCircle.classList.add("fa-solid");
-    listCircle.classList.add("fa-circle");
-    itemContainer.append(listCircle, listHeader);
+    listCircle.classList.add("fa-solid", "fa-circle");
+    itemContainer.append(listCircle, listHeader, openDropDownButtonElement);
     listsList.appendChild(itemContainer);
-    const itemRect = itemContainer.getBoundingClientRect();
-    const dropdown = dropDownActionList(id, itemRect);
-    itemContainer.append(dropdown.dropDownButton, dropdown.dropdown);
+    let itemContainerRect = itemContainer.getBoundingClientRect();
+    openDropDownButtonElement.addEventListener("click", (e) => {
+        OpenDropDownHandler(e, itemContainerRect, id, favorite);
+    });
     return {
         id: counter,
         title: header,
         description: description,
         date: date,
+        favorite: false,
     };
 }
-function dropDownActionList(id, itemRect) {
-    const iconClasses = [
-        { name: "Edit List", classes: ["fa-solid", "fa-pen-to-square"] },
-        { name: "Favorite List", classes: ["fa-regular", "fa-heart"] },
-        { name: "Duplicate List", classes: ["fa-solid", "fa-clone"] },
-        { name: "Archive List", classes: ["fa-solid", "fa-box-archive"] },
-        { name: "Delete List", classes: ["fa-solid", "fa-trash"] },
-    ];
-    const dropdown = document.createElement("div");
-    const dropdownButton = document.createElement("div");
-    const ellipsisElement = document.createElement("i");
-    const actionMenuElement = document.createElement("ul");
-    const menuRect = ellipsisElement.getBoundingClientRect();
-    actionMenuElement.classList.add("action-menu");
-    ellipsisElement.classList.add("fa-solid", "fa-ellipsis");
-    dropdownButton.classList.add("dropdown-button");
-    dropdownButton.appendChild(ellipsisElement);
-    dropdown.classList.add("dropdown", "hide");
-    dropdownButton.addEventListener("click", () => {
-        dropdown.classList.toggle("hide");
+function createFavoriteElement(id, header, favorite) {
+    const itemContainerElement = document.createElement("li");
+    const favoriteIconElement = document.createElement("i");
+    const favoriteHeaderElement = document.createElement("h4");
+    itemContainerElement.setAttribute("data-id", id.toString());
+    itemContainerElement.classList.add("list-favorite-element");
+    favoriteIconElement.classList.add("fa-solid", "fa-heart", "fill");
+    favoriteHeaderElement.innerText = header;
+    favoriteIconElement.addEventListener("click", () => {
+        listArray = listArray.map((item) => {
+            if (item.id == id) {
+                return Object.assign(Object.assign({}, item), { favorite: !item.favorite });
+            }
+            return item;
+        });
+        preUpdate();
+        init();
     });
-    iconClasses.forEach((icon) => {
-        const liElement = document.createElement("li");
-        const iconElement = document.createElement("i");
-        const headerElement = document.createElement("small");
-        liElement.classList.add("action-menu-item");
-        iconElement.classList.add(...icon.classes);
-        headerElement.innerText = icon.name;
-        liElement.append(iconElement, headerElement);
-        actionMenuElement.append(liElement);
-    });
-    dropdown.style.top = `${itemRect.top}px`;
-    dropdown.style.left = `${itemRect.right + 30}px`;
-    console.log(itemRect);
-    dropdown.append(actionMenuElement);
-    dropdown.setAttribute("data-id", id.toString());
-    return { dropDownButton: dropdownButton, dropdown: dropdown };
+    itemContainerElement.append(favoriteHeaderElement, favoriteIconElement);
+    favoritesList.append(itemContainerElement);
+}
+function OpenDropDownHandler(e, rect, id, favorite) {
+    if (e.target instanceof HTMLElement) {
+        const target = e.target;
+        const datasetId = target.dataset.id;
+        if (!target.dataset.toggled && target.dataset.toggled != "") {
+            target.setAttribute("data-toggled", "");
+            dropDownElement.style.top = `${rect.top}px`;
+            dropDownElement.style.left = `${rect.right + 20}px`;
+            document
+                .querySelectorAll(".fa-ellipsis")
+                .forEach((el) => {
+                if (lastToggledDropDown.toString() == el.dataset.id) {
+                    el.removeAttribute("data-toggled");
+                }
+            });
+            favoriteFill(favorite);
+            dropDownElement.setAttribute("data-id", datasetId);
+            lastToggledDropDown = id;
+            dropDownElement.classList.remove("hide");
+        }
+        else {
+            dropDownElement.removeAttribute("data-id");
+            hideDropDown();
+            target.removeAttribute("data-toggled");
+            lastToggledDropDown = 0;
+        }
+    }
+}
+function favoriteFill(favorite) {
+    if (favorite) {
+        document.querySelector(".dropdown-favorite").classList.add("fill");
+    }
+    else {
+        document.querySelector(".dropdown-favorite").classList.remove("fill");
+    }
+}
+function calculateTimeSince(timestamp) {
+    const timeElapsed = Date.now() - timestamp;
+    const days = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeElapsed / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((timeElapsed / 1000 / 60) % 60);
+    const seconds = Math.floor((timeElapsed / 1000) % 60);
+    if (days > 1) {
+        return `${days} days ago`;
+    }
+    else if (hours > 1) {
+        return `${minutes} minutes ago`;
+    }
+    else if (seconds > 1) {
+        return `${seconds} seconds ago`;
+    }
+    else {
+        return "now";
+    }
 }
 function init() {
     if (!window.localStorage.getItem("list")) {
@@ -110,15 +252,36 @@ function init() {
     else {
         const temporaryListArray = JSON.parse(window.localStorage.getItem("list") || "");
         if (temporaryListArray.length > 0) {
-            counter = temporaryListArray.slice(-1)[0].id + 1;
-            listArray = temporaryListArray;
-            temporaryListArray.forEach((element) => {
-                createListElement(element.id, element.title, element.description, element.date);
-            });
+            listsInit(temporaryListArray);
+            favoritesInit(temporaryListArray);
         }
     }
 }
+function listsInit(tempListArr) {
+    listsList.innerHTML = "";
+    counter = tempListArr.slice(-1)[0].id + 1;
+    listArray = tempListArr;
+    tempListArr.forEach((element) => {
+        createListElement(element.id, element.title, element.description, element.date, element.favorite);
+    });
+}
+function favoritesInit(tempListArr) {
+    favoritesList.innerHTML = "";
+    tempListArr.forEach((element) => {
+        if (element.favorite) {
+            createFavoriteElement(element.id, element.title, element.favorite);
+        }
+    });
+}
+function hideDropDown() {
+    dropDownElement.classList.add("hide");
+}
+function preUpdate() {
+    window.localStorage.setItem("list", JSON.stringify(listArray));
+}
 function exitPopup() {
-    createPopupElement.classList.remove("show");
     overlayElement.classList.remove("show");
+}
+function enterPopup() {
+    overlayElement.classList.toggle("show");
 }

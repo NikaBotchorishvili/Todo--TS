@@ -1,5 +1,5 @@
 .show{
-	display: block;
+	display: flex;
 }
 
 .fa-angle-left {
@@ -12,17 +12,16 @@
 	transform: translateX(-100%);
 }
 
-.fa-ellipsis{
-	scale: 1.4;
-	cursor: pointer;
-	padding: 5px;
-}
 
 .fade {
-	opacity: 0.2;
-	transform: translateY(-150%);
+	opacity: 0;
+	transform: translateY(-200%);
 }
 
 .hide{
 	display: none;
+}
+
+.fill{
+	color: red;
 }

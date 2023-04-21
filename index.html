@@ -33,10 +33,19 @@
 										class="fa-solid fa-plus open-create-popup"
 										aria-label="Add List"
 									></i>
-									<i class="fa-solid fa-angle-left"></i>
+									<i class="fa-solid fa-angle-left expand-list"></i>
 								</div>
 							</div>
 							<ul class="lists-list"></ul>
+						</div>
+						<div class="favorites">
+							<div class="favorites-header">
+								<h1>Favorites</h1>
+								<i class="fa-solid fa-angle-left expand-favorites"></i>
+							</div>
+							<ul class="favorites-list">
+								
+							</ul>
 						</div>
 					</div>
 				</aside>
@@ -45,7 +54,7 @@
 
 		<div class="popup create-popup">
 			<h1>Add list</h1>
-			<form class="create-item-wrapper">
+			<form class="form-wrapper">
 				<div class="input-group">
 					<label for="header_input">Name</label>
 					<input type="text" name="header_input" />
@@ -63,12 +72,78 @@
 				</div>
 
 				<div class="input-group buttons">
-					<div class="button cancel">Cancel</div>
+					<div class="button create-cancel">Cancel</div>
 
-					<button class="button create-list">Add</button>
+					<button class="button submit-button create-list">Add</button>
 				</div>
 			</form>
 		</div>
+
+		<div class="popup edit-popup">
+			<h1>Edit list</h1>
+			<form class="form-wrapper">
+				<div class="input-group">
+					<label for="edit_header_input">Name</label>
+					<input
+						type="text"
+						class="header_input"
+						name="edit_header_input"
+					/>
+				</div>
+				<div class="input-group">
+					<label for="edit_description_input">Description</label>
+
+					<textarea
+						class="textarea"
+						name="edit_description_input"
+						id=""
+						cols="30"
+						rows="8"
+					></textarea>
+				</div>
+
+				<div class="input-group buttons">
+					<div class="button edit-cancel">Cancel</div>
+
+					<button class="button submit-button edit-list">Edit</button>
+				</div>
+			</form>
+		</div>
+
+		<div class="popup delete-popup">
+			<h1>Delete List</h1>
+			<form class="create-item-wrapper">
+				<div class="input-group buttons">
+					<div class="button cancel delete-cancel">Cancel</div>
+
+					<button class="button submit-button delete-list">Delete</button>
+				</div>
+			</form>
+		</div>
+
+		<div class="dropdown hide">
+			<ul class="action-menu">
+				<li class="action-menu-item edit">
+					<i class="fa-solid fa-pen-to-square"></i>
+					<h5>Edit</h5>
+				</li>
+				<li class="action-menu-item favorite">
+					<i class="fa-solid fa-heart dropdown-favorite"></i>
+					<h5>Favorite</h5>
+				</li>
+				<li class="action-menu-item duplicate">
+					<i class="fa-solid fa-clone"></i>
+					<h5>Duplicate</h5>
+				</li>
+
+				<li class="action-menu-item delete">
+					<i class="fa-solid fa-trash"></i>
+					<h5>Delete</h5>
+				</li>
+			</ul>
+		</div>
+
+
 		<div class="overlay"></div>
 		<footer>
 			<script src="./src/js/index.js"></script>

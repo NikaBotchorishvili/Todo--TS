@@ -3,12 +3,14 @@ type List = {
 	title: string;
 	description: string;
 	date: Date;
+	favorite: boolean;
 };
 
 // 	Overlay for blurring
 const overlayElement = document.querySelector(".overlay") as HTMLElement;
 
 const listsList = document.querySelector(".lists-list") as HTMLElement;
+const favoritesList = document.querySelector(".favorites-list") as HTMLElement;
 
 const createItemPopupButtonElement = document.querySelector(
 	".open-create-popup"
@@ -18,7 +20,7 @@ const createPopupElement = document.querySelector(
 ) as HTMLElement;
 const createListButton = document.querySelector(".create-list");
 const cancelListCreateElement = document.querySelector(
-	".cancel"
+	".create-cancel"
 ) as HTMLElement;
 
 const headerInputElement = document.querySelector(
@@ -31,19 +33,48 @@ const descriptionInputElement = document.querySelector(
 const asideElement = document.querySelector("aside");
 const menuElement = document.querySelector(".fa-bars") as HTMLElement;
 
-const listsArrowElement = document.querySelector(
-	".fa-angle-left"
+const expandList = document.querySelector(".expand-list") as HTMLElement;
+const expandFavorites = document.querySelector(
+	".expand-favorites"
 ) as HTMLElement;
-const listsListElement = document.querySelector(".lists-list") as HTMLElement;
 
-listsArrowElement.addEventListener("click", () => {
-	listsArrowElement.classList.toggle("rotate");
-	listsListElement.classList.toggle("fade");
-});
+const dropDownElement = document.querySelector(".dropdown") as HTMLElement;
 
-menuElement.addEventListener("click", () => {
-	asideElement.classList.toggle("slide");
-});
+const editButtonElement = document.querySelector(".edit") as HTMLElement;
+const editPopupElement = document.querySelector(".edit-popup") as HTMLElement;
+const editHeaderInputElement = document.querySelector(
+	"input[name=edit_header_input]"
+) as HTMLInputElement;
+const editDescriptionInput = document.querySelector(
+	"textarea[name=edit_description_input]"
+) as HTMLInputElement;
+
+const editCancelButton = document.querySelector(
+	".edit-cancel"
+) as HTMLButtonElement;
+const editSubmitButton = document.querySelector(
+	".edit-list"
+) as HTMLButtonElement;
+
+const favoriteButtonElement = document.querySelector(
+	".favorite"
+) as HTMLElement;
+const duplicateButtonElement = document.querySelector(
+	".duplicate"
+) as HTMLElement;
+
+const deleteButtonElement = document.querySelector(".delete") as HTMLElement;
+const deleteSubmitButtonElement = document.querySelector(
+	".delete-list"
+) as HTMLElement;
+const deletePopupElement = document.querySelector(
+	".delete-popup"
+) as HTMLElement;
+const deleteCancelElement = document.querySelector(
+	".delete-cancel"
+) as HTMLElement;
+
+let lastToggledDropDown = 0;
 
 let listArray: List[] = [];
 let counter: number = 1;
@@ -51,11 +82,12 @@ let counter: number = 1;
 init();
 
 createItemPopupButtonElement.addEventListener("click", () => {
-	createPopupElement.classList.toggle("show");
-	overlayElement.classList.toggle("show");
+	createPopupElement.classList.add("show");
+	enterPopup();
 });
 
 cancelListCreateElement.addEventListener("click", () => {
+	createPopupElement.classList.remove("show");
 	exitPopup();
 });
 
@@ -64,97 +96,247 @@ createListButton?.addEventListener("click", (e) => {
 	let date = new Date();
 	let headerInputValue = headerInputElement.value.trim();
 	let descriptionInputValue = descriptionInputElement.value.trim();
-	if (
-		headerInputValue != "" &&
-		headerInputValue.trim().length != 0 &&
-		descriptionInputValue != "" &&
-		descriptionInputValue.trim().length != 0
-	) {
+	if (headerInputValue != "" && descriptionInputValue != "") {
 		let todoInfo = createListElement(
 			counter,
 			headerInputValue,
 			descriptionInputValue,
-			date
+			date,
+			false
 		);
 
 		listArray.push(todoInfo);
-		window.localStorage.setItem("list", JSON.stringify(listArray));
+		preUpdate();
 		headerInputElement.value = "";
 		descriptionInputElement.value = "";
+		createPopupElement.classList.remove("show");
 		exitPopup();
 		counter++;
 	}
+});
+
+editButtonElement.addEventListener("click", () => {
+	let id = dropDownElement.dataset.id;
+	editPopupElement.classList.add("show");
+	let item = listArray.filter((listItem) => listItem.id == Number(id))[0];
+	editHeaderInputElement.value = item.title;
+	editDescriptionInput.value = item.description;
+	enterPopup();
+});
+
+editCancelButton.addEventListener("click", (e) => {
+	e.preventDefault();
+	exitPopup();
+	hideDropDown();
+	editPopupElement.classList.remove("show");
+});
+
+editSubmitButton.addEventListener("click", (e) => {
+	e.preventDefault();
+	if (
+		editHeaderInputElement.value.trim() != "" &&
+		editDescriptionInput.value.trim() != ""
+	) {
+		let id = dropDownElement.dataset.id;
+		listArray = listArray.map((item) => {
+			if (item.id == Number(id)) {
+				return {
+					...item,
+					title: editHeaderInputElement.value,
+					description: editDescriptionInput.value,
+				};
+			}
+			return item;
+		});
+
+		editDescriptionInput.value = "";
+		editDescriptionInput.value = "";
+		preUpdate();
+
+		exitPopup();
+		editPopupElement.classList.remove("show");
+		init();
+	}
+});
+favoriteButtonElement.addEventListener("click", () => {
+	let id = dropDownElement.dataset.id;
+	let dropdownFavorite = document.querySelector(".dropdown-favorite")
+	listArray = listArray.map((listItem): List => {
+		if (listItem.id == Number(id)) {
+			return { ...listItem, favorite: !listItem.favorite };
+		}
+		return listItem;
+	});
+
+	let isFavorite = listArray.filter((item) => item.id == Number(id))[0]
+		.favorite;
+
+	if (isFavorite) {
+		dropdownFavorite.classList.add("fill");
+	} else {
+		dropdownFavorite.classList.remove("fill");
+	}
+	preUpdate();
+	init();
+});
+
+duplicateButtonElement.addEventListener("click", () => {
+	let date = new Date();
+	let id = dropDownElement.dataset.id;
+	let item: List = listArray.filter((list) => list.id == Number(id))[0];
+	counter++;
+	let duplicateInfo = createListElement(
+		counter,
+		item.title,
+		item.description,
+		date,
+		item.favorite
+	);
+	listArray.push(duplicateInfo);
+	preUpdate();
+});
+
+deleteButtonElement.addEventListener("click", () => {
+	deletePopupElement.classList.add("show");
+	enterPopup();
+});
+
+deleteSubmitButtonElement.addEventListener("click", (e) => {
+	e.preventDefault();
+
+	let id = dropDownElement.dataset.id;
+	listArray = listArray.filter((listItem) => listItem.id != Number(id));
+	exitPopup();
+	deletePopupElement.classList.remove("show");
+	preUpdate();
+	init();
+	hideDropDown();
+});
+
+deleteCancelElement.addEventListener("click", (e) => {
+	e.preventDefault();
+	deletePopupElement.classList.remove("show");
+	exitPopup();
+});
+
+expandList.addEventListener("click", () => {
+	expandList.classList.toggle("rotate");
+	listsList.classList.toggle("fade");
+});
+
+expandFavorites.addEventListener("click", () => {
+	expandFavorites.classList.toggle("rotate");
+	favoritesList.classList.toggle("fade");
+});
+
+menuElement.addEventListener("click", () => {
+	asideElement.classList.toggle("slide");
 });
 
 function createListElement(
 	id: number,
 	header: string,
 	description: string,
-	date: Date
+	date: Date,
+	favorite: boolean
 ): List {
 	const itemContainer = document.createElement("li");
 	const listCircle = document.createElement("i");
 	const listHeader = document.createElement("h4");
+	const openDropDownButtonElement = document.createElement("i");
+	openDropDownButtonElement.classList.add("fa-solid", "fa-ellipsis");
+	openDropDownButtonElement.setAttribute("data-id", id.toString());
 
+	itemContainer.classList.add("lists-list-element");
 	listHeader.innerText = header;
 	listHeader.setAttribute("data-list-id", id.toString());
-	listCircle.classList.add("fa-solid");
-	listCircle.classList.add("fa-circle");
+	listCircle.classList.add("fa-solid", "fa-circle");
 
-	itemContainer.append(listCircle, listHeader);
+	itemContainer.append(listCircle, listHeader, openDropDownButtonElement);
 
 	listsList.appendChild(itemContainer);
-	const itemRect = itemContainer.getBoundingClientRect();
-	const dropdown = dropDownActionList(id, itemRect);
+	let itemContainerRect = itemContainer.getBoundingClientRect();
+	openDropDownButtonElement.addEventListener("click", (e) => {
+		OpenDropDownHandler(e, itemContainerRect, id, favorite);
+	});
 
-	itemContainer.append(dropdown.dropDownButton, dropdown.dropdown);
 	return {
 		id: counter,
 		title: header,
 		description: description,
 		date: date,
+		favorite: false,
 	};
 }
 
-function dropDownActionList(id: number, itemRect: DOMRect) {
-	const iconClasses = [
-		{ name: "Edit List", classes: ["fa-solid", "fa-pen-to-square"] },
-		{ name: "Favorite List", classes: ["fa-regular", "fa-heart"] },
-		{ name: "Duplicate List", classes: ["fa-solid", "fa-clone"] },
-		{ name: "Archive List", classes: ["fa-solid", "fa-box-archive"] },
-		{ name: "Delete List", classes: ["fa-solid", "fa-trash"] },
-	];
-	const dropdown = document.createElement("div");
-	const dropdownButton = document.createElement("div");
-	const ellipsisElement = document.createElement("i");
-	const actionMenuElement = document.createElement("ul");
+function createFavoriteElement(id: number, header: string, favorite: boolean) {
+	const itemContainerElement = document.createElement("li");
+	const favoriteIconElement = document.createElement("i");
+	const favoriteHeaderElement = document.createElement("h4");
 
-	actionMenuElement.classList.add("action-menu");
-	ellipsisElement.classList.add("fa-solid", "fa-ellipsis");
-	dropdownButton.classList.add("dropdown-button");
-	dropdownButton.appendChild(ellipsisElement);
+	itemContainerElement.setAttribute("data-id", id.toString());
 
-	dropdown.classList.add("dropdown", "hide");
-	dropdownButton.addEventListener("click", () => {
-		dropdown.classList.toggle("hide");
+	itemContainerElement.classList.add("list-favorite-element");
+	favoriteIconElement.classList.add("fa-solid", "fa-heart", "fill");
+	favoriteHeaderElement.innerText = header;
+
+	favoriteIconElement.addEventListener("click", () => {
+		listArray = listArray.map((item) => {
+			if (item.id == id) {
+				return { ...item, favorite: !item.favorite };
+			}
+			return item;
+		});
+		preUpdate();
+
+		init();
 	});
-	iconClasses.forEach((icon) => {
-		const liElement = document.createElement("li");
-		const iconElement = document.createElement("i");
-		const headerElement = document.createElement("small");
+	itemContainerElement.append(favoriteHeaderElement, favoriteIconElement);
+	favoritesList.append(itemContainerElement);
+}
 
-		liElement.classList.add("action-menu-item")
-		iconElement.classList.add(...icon.classes);
-		headerElement.innerText = icon.name;
-		liElement.append(iconElement, headerElement)
+function OpenDropDownHandler(
+	e: Event,
+	rect: DOMRect,
+	id: number,
+	favorite: boolean
+): void {
+	if (e.target instanceof HTMLElement) {
+		const target = e.target;
+		const datasetId = target.dataset.id;
 
-		actionMenuElement.append(liElement);
-	});
-	dropdown.style.top = `${itemRect.top}px`;
-	dropdown.style.left = `${itemRect.right + 30}px`
-	dropdown.append(actionMenuElement);
-	dropdown.setAttribute("data-id", id.toString());
-	return { dropDownButton: dropdownButton, dropdown: dropdown };
+		if (!target.dataset.toggled && target.dataset.toggled != "") {
+			target.setAttribute("data-toggled", "");
+			dropDownElement.style.top = `${rect.top}px`;
+			dropDownElement.style.left = `${rect.right + 20}px`;
+			document
+				.querySelectorAll(".fa-ellipsis")
+				.forEach((el: HTMLElement) => {
+					if (lastToggledDropDown.toString() == el.dataset.id) {
+						el.removeAttribute("data-toggled");
+					}
+				});
+			
+			favoriteFill(favorite)
+			dropDownElement.setAttribute("data-id", datasetId);
+			lastToggledDropDown = id;
+
+			dropDownElement.classList.remove("hide");
+		} else {
+			dropDownElement.removeAttribute("data-id");
+			hideDropDown();
+			target.removeAttribute("data-toggled");
+			lastToggledDropDown = 0;
+		}
+	}
+}
+
+function favoriteFill(favorite: boolean): void {
+	if (favorite) {
+		document.querySelector(".dropdown-favorite").classList.add("fill");
+	}else{
+		document.querySelector(".dropdown-favorite").classList.remove("fill");
+	}
 }
 
 function calculateTimeSince(timestamp: number) {
@@ -183,41 +365,48 @@ function init() {
 		const temporaryListArray: List[] = JSON.parse(
 			window.localStorage.getItem("list") || ""
 		);
-
 		if (temporaryListArray.length > 0) {
-			counter = temporaryListArray.slice(-1)[0].id + 1;
-			listArray = temporaryListArray;
-			temporaryListArray.forEach((element: List) => {
-				createListElement(
-					element.id,
-					element.title,
-					element.description,
-					element.date
-				);
-			});
+			listsInit(temporaryListArray);
+			favoritesInit(temporaryListArray);
 		}
 	}
 }
 
-// function update() {
-// 	const temporaryListArray: ListItem[] = JSON.parse(
-// 		window.localStorage.getItem("list") || ""
-// 	);
-// 	list.innerHTML = "";
-// 	if (temporaryListArray.length > 0) {
-// 		counter = temporaryListArray.slice(-1)[0].id + 1;
-// 		temporaryListArray.forEach((element: ListItem) => {
-// 			createItemElement(
-// 				element.id,
-// 				element.title,
-// 				element.description,
-// 				element.completed,
-// 				element.date
-// 			);
-// 		});
-// 	}
-// }
+function listsInit(tempListArr: List[]): void {
+	listsList.innerHTML = "";
+	counter = tempListArr.slice(-1)[0].id + 1;
+	listArray = tempListArr;
+	tempListArr.forEach((element: List) => {
+		createListElement(
+			element.id,
+			element.title,
+			element.description,
+			element.date,
+			element.favorite
+		);
+	});
+}
+
+function favoritesInit(tempListArr: List[]): void {
+	favoritesList.innerHTML = "";
+	tempListArr.forEach((element) => {
+		if (element.favorite) {
+			createFavoriteElement(element.id, element.title, element.favorite);
+		}
+	});
+}
+
+function hideDropDown(): void {
+	dropDownElement.classList.add("hide");
+}
+
+function preUpdate(): void {
+	window.localStorage.setItem("list", JSON.stringify(listArray));
+}
+
 function exitPopup(): void {
-	createPopupElement.classList.remove("show");
 	overlayElement.classList.remove("show");
+}
+function enterPopup(): void {
+	overlayElement.classList.toggle("show");
 }
