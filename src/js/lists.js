@@ -1,3 +1,5 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const overlayElement = document.querySelector(".overlay");
 const listsList = document.querySelector(".lists-list");
 const favoritesList = document.querySelector(".favorites-list");
@@ -146,7 +148,6 @@ menuElement.addEventListener("click", () => {
 });
 function createListElement(id, header, description, date, favorite) {
     const itemContainer = document.createElement("li");
-    const listCircle = document.createElement("i");
     const listHeader = document.createElement("h4");
     const openDropDownButtonElement = document.createElement("i");
     openDropDownButtonElement.classList.add("fa-solid", "fa-ellipsis");
@@ -154,8 +155,7 @@ function createListElement(id, header, description, date, favorite) {
     itemContainer.classList.add("lists-list-element");
     listHeader.innerText = header;
     listHeader.setAttribute("data-list-id", id.toString());
-    listCircle.classList.add("fa-solid", "fa-circle");
-    itemContainer.append(listCircle, listHeader, openDropDownButtonElement);
+    itemContainer.append(listHeader, openDropDownButtonElement);
     listsList.appendChild(itemContainer);
     let itemContainerRect = itemContainer.getBoundingClientRect();
     openDropDownButtonElement.addEventListener("click", (e) => {
@@ -167,6 +167,7 @@ function createListElement(id, header, description, date, favorite) {
         description: description,
         date: date,
         favorite: false,
+        items: [],
     };
 }
 function createFavoriteElement(id, header, favorite) {
@@ -197,7 +198,7 @@ function OpenDropDownHandler(e, rect, id, favorite) {
         if (!target.dataset.toggled && target.dataset.toggled != "") {
             target.setAttribute("data-toggled", "");
             dropDownElement.style.top = `${rect.top}px`;
-            dropDownElement.style.left = `${rect.right + 20}px`;
+            dropDownElement.style.left = `${rect.right + 25}px`;
             document
                 .querySelectorAll(".fa-ellipsis")
                 .forEach((el) => {

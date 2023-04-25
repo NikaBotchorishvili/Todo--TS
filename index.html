@@ -22,36 +22,75 @@
 					<h1>To do</h1>
 				</div>
 			</header>
-			<main>
+			<main id="todo">
 				<aside class="sidebar">
 					<div class="sidebar-container">
 						<div class="lists">
-							<div class="lists-create">
+							<div class="lists-create border-bottom">
 								<h1>Lists</h1>
 								<div class="lists-actions">
 									<i
 										class="fa-solid fa-plus open-create-popup"
 										aria-label="Add List"
 									></i>
-									<i class="fa-solid fa-angle-left expand-list"></i>
+									<i
+										class="fa-solid fa-angle-left expand-list"
+									></i>
 								</div>
 							</div>
 							<ul class="lists-list"></ul>
 						</div>
 						<div class="favorites">
-							<div class="favorites-header">
+							<div class="favorites-header border-bottom">
 								<h1>Favorites</h1>
-								<i class="fa-solid fa-angle-left expand-favorites"></i>
+								<i
+									class="fa-solid fa-angle-left expand-favorites"
+								></i>
 							</div>
-							<ul class="favorites-list">
-								
-							</ul>
+							<ul class="favorites-list"></ul>
 						</div>
 					</div>
 				</aside>
+				<div class="items-container">
+					<div class="list-main">
+						<div class="list-header">
+							<h2>Inbox</h2>
+							<i class="fa-solid fa-trash"></i>
+						</div>
+						<div class="item-input">
+							<input type="text" placeholder="Task name" />
+							<textarea placeholder="Task Description"></textarea>
+
+							<div class="item-button-group">
+								<button class="button">Cancel</button>
+								<button class="button submit-button">
+									Add
+								</button>
+							</div>
+						</div>
+					</div>
+					<ul class="items-list">
+						<li class="item">
+							<input type="checkbox" checked />
+							<h5>title</h5>
+							<small>
+								Lorem ipsum dolor sit amet consectetur
+							</small>
+						</li>
+					</ul>
+				</div>
 			</main>
 		</div>
 
+		<div class="splash-screen">
+			<div class="splash-screen-content">
+				<h1 class="splash-screen-header">
+					<span class="logo splash-screen-element">To</span>
+					<span class="logo splash-screen-element">Do.</span>
+				</h1>
+				<h4 class="splash-screen-element">Plan Out Your Day!</h4>
+			</div>
+		</div>
 		<div class="popup create-popup">
 			<h1>Add list</h1>
 			<form class="form-wrapper">
@@ -72,9 +111,11 @@
 				</div>
 
 				<div class="input-group buttons">
-					<div class="button create-cancel">Cancel</div>
+					<div class="button submit-cancel create-cancel">Cancel</div>
 
-					<button class="button submit-button create-list">Add</button>
+					<button class="button submit-button create-list">
+						Add
+					</button>
 				</div>
 			</form>
 		</div>
@@ -116,7 +157,9 @@
 				<div class="input-group buttons">
 					<div class="button cancel delete-cancel">Cancel</div>
 
-					<button class="button submit-button delete-list">Delete</button>
+					<button class="button submit-button delete-list">
+						Delete
+					</button>
 				</div>
 			</form>
 		</div>
@@ -143,10 +186,14 @@
 			</ul>
 		</div>
 
-
 		<div class="overlay"></div>
 		<footer>
-			<script src="./src/js/index.js"></script>
+			<script>
+				let exports = {};
+			</script>
+			<script src="./src/js/splashScreen.js"></script>
+			<script src="./src/js/lists.js"></script>
+			<script src="./src/js/item.js"></script>
 		</footer>
 	</body>
 </html>

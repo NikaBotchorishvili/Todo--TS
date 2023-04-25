@@ -1,10 +1,4 @@
-type List = {
-	id: number;
-	title: string;
-	description: string;
-	date: Date;
-	favorite: boolean;
-};
+import {List, ListItem} from "./types/Types"
 
 // 	Overlay for blurring
 const overlayElement = document.querySelector(".overlay") as HTMLElement;
@@ -241,7 +235,6 @@ function createListElement(
 	favorite: boolean
 ): List {
 	const itemContainer = document.createElement("li");
-	const listCircle = document.createElement("i");
 	const listHeader = document.createElement("h4");
 	const openDropDownButtonElement = document.createElement("i");
 	openDropDownButtonElement.classList.add("fa-solid", "fa-ellipsis");
@@ -250,9 +243,9 @@ function createListElement(
 	itemContainer.classList.add("lists-list-element");
 	listHeader.innerText = header;
 	listHeader.setAttribute("data-list-id", id.toString());
-	listCircle.classList.add("fa-solid", "fa-circle");
 
-	itemContainer.append(listCircle, listHeader, openDropDownButtonElement);
+
+	itemContainer.append(listHeader, openDropDownButtonElement);
 
 	listsList.appendChild(itemContainer);
 	let itemContainerRect = itemContainer.getBoundingClientRect();
@@ -266,6 +259,7 @@ function createListElement(
 		description: description,
 		date: date,
 		favorite: false,
+		items: [],
 	};
 }
 
@@ -308,7 +302,7 @@ function OpenDropDownHandler(
 		if (!target.dataset.toggled && target.dataset.toggled != "") {
 			target.setAttribute("data-toggled", "");
 			dropDownElement.style.top = `${rect.top}px`;
-			dropDownElement.style.left = `${rect.right + 20}px`;
+			dropDownElement.style.left = `${rect.right + 25}px`;
 			document
 				.querySelectorAll(".fa-ellipsis")
 				.forEach((el: HTMLElement) => {
