@@ -157,6 +157,7 @@ header {
 	width: 90%;
 	justify-content: space-between;
 	align-items: center;
+	cursor: pointer;
 }
 
 .popup {
@@ -187,8 +188,8 @@ header {
 	z-index: 1;
 }
 .create-popup {
-	width: 500px;
-	height: 450px;
+	width: 550px;
+	height: 550px;
 	display: none;
 	justify-content: space-between;
 	flex-direction: column;
@@ -208,7 +209,7 @@ header {
 	border: 1px solid black;
 	padding: 10px 20px;
 }
-.form-wrapper textarea[name="description_input"] {
+.textarea {
 	resize: none;
 	border-radius: 10px;
 	border: 1px solid black;
@@ -234,6 +235,7 @@ header {
 	padding: 5px 30px;
 	border-radius: 10px;
 	border: none;
+	cursor: pointer;
 }
 
 .submit-button {
@@ -282,8 +284,8 @@ header {
 
 .edit-popup{
 	display: none;
-	width: 400px;
-	height: 450px;
+	width: 550px;
+	height: 500px;
 }
 
 .delete-list {
@@ -340,7 +342,7 @@ header {
 	width: 90%;
 }
 
-.item-input{
+.item-form{
 	display: flex;
 
 	flex-direction: column;
@@ -352,17 +354,44 @@ header {
 
 }
 
-.item-input > input, textarea{
+.item-form > input, textarea{
 	border: none;
 }
 
-.item-input > input:focus, textarea:focus{
+.item-form > input:focus, textarea:focus{
 	outline: none;
 }
-.item-input > textarea{
+.item-form > textarea{
 	height: fit-content;
 	overflow: hidden;
 
+}
+
+.create-task{
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	color: var(--mainColor);
+	cursor: pointer;
+	width: 100%;
+}
+.add-task{
+	padding: 2px;
+
+}
+.create-task > h4{
+	color: var(--secColor);
+}
+
+.create-task:hover > .add-task{
+	color: white;
+	background-color: var(--mainColor);
+	border-radius: 20px;
+}
+
+.create-task:hover > h4{
+	color: var(--mainColor);
+	border-radius: 20px;
 }
 
 .items-container{
@@ -371,7 +400,6 @@ header {
 	flex-direction: column;
 	flex-grow: 1;
 	max-height: 100vh;
-	/* overflow-y: auto; */
 	gap: 30px;
 }
 
@@ -389,6 +417,15 @@ header {
 	overflow: visible;
 	height: 100px;
 	width: 50%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.task-actions{
+	display: flex;
+	width: 10%;
+	justify-content: space-between;
 }
 
 

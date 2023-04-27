@@ -1,31 +1,34 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const overlayElement = document.querySelector(".overlay");
-const listsList = document.querySelector(".lists-list");
-const favoritesList = document.querySelector(".favorites-list");
-const createItemPopupButtonElement = document.querySelector(".open-create-popup");
-const createPopupElement = document.querySelector(".create-popup");
-const createListButton = document.querySelector(".create-list");
-const cancelListCreateElement = document.querySelector(".create-cancel");
-const headerInputElement = document.querySelector("input[name=header_input]");
-const descriptionInputElement = document.querySelector("textarea[name=description_input]");
-const asideElement = document.querySelector("aside");
-const menuElement = document.querySelector(".fa-bars");
-const expandList = document.querySelector(".expand-list");
-const expandFavorites = document.querySelector(".expand-favorites");
-const dropDownElement = document.querySelector(".dropdown");
-const editButtonElement = document.querySelector(".edit");
-const editPopupElement = document.querySelector(".edit-popup");
-const editHeaderInputElement = document.querySelector("input[name=edit_header_input]");
-const editDescriptionInput = document.querySelector("textarea[name=edit_description_input]");
-const editCancelButton = document.querySelector(".edit-cancel");
-const editSubmitButton = document.querySelector(".edit-list");
-const favoriteButtonElement = document.querySelector(".favorite");
-const duplicateButtonElement = document.querySelector(".duplicate");
-const deleteButtonElement = document.querySelector(".delete");
-const deleteSubmitButtonElement = document.querySelector(".delete-list");
-const deletePopupElement = document.querySelector(".delete-popup");
-const deleteCancelElement = document.querySelector(".delete-cancel");
+import { itemInit } from "./item.js";
+import { preUpdate, calculateTimeSince } from "../helpers/helpers.js";
+const $ = (selector) => document.querySelector(selector);
+const overlayElement = $(".overlay");
+const listsList = $(".lists-list");
+const favoritesList = $(".favorites-list");
+const createItemPopupButtonElement = $(".open-create-popup");
+const createPopupElement = $(".create-popup");
+const createListButton = $(".create-list");
+const cancelListCreateElement = $(".create-cancel");
+const headerInputElement = $("input[name=header_input]");
+const descriptionInputElement = $("textarea[name=description_input]");
+const asideElement = $("aside");
+const menuElement = $(".fa-bars");
+const expandList = $(".expand-list");
+const expandFavorites = $(".expand-favorites");
+const dropDownElement = $(".dropdown");
+const editButtonElement = $(".edit");
+const editPopupElement = $(".edit-popup");
+const editHeaderInputElement = $("input[name=edit_header_input]");
+const editDescriptionInput = $("textarea[name=edit_description_input]");
+const editCancelButton = $(".edit-cancel");
+const editSubmitButton = $(".edit-list");
+const favoriteButtonElement = $(".favorite");
+const duplicateButtonElement = $(".duplicate");
+const deleteButtonElement = $(".delete");
+const deleteSubmitButtonElement = $(".delete-list");
+const deletePopupElement = $(".delete-popup");
+const deleteCancelElement = $(".delete-cancel");
+const listHeaderElement = $(".list-name");
+const listAddedElement = $(".list-added-since");
 let lastToggledDropDown = 0;
 let listArray = [];
 let counter = 1;
@@ -43,10 +46,10 @@ createListButton === null || createListButton === void 0 ? void 0 : createListBu
     let date = new Date();
     let headerInputValue = headerInputElement.value.trim();
     let descriptionInputValue = descriptionInputElement.value.trim();
-    if (headerInputValue != "" && descriptionInputValue != "") {
+    if (headerInputValue != "") {
         let todoInfo = createListElement(counter, headerInputValue, descriptionInputValue, date, false);
         listArray.push(todoInfo);
-        preUpdate();
+        preUpdate(listArray);
         headerInputElement.value = "";
         descriptionInputElement.value = "";
         createPopupElement.classList.remove("show");
@@ -81,7 +84,7 @@ editSubmitButton.addEventListener("click", (e) => {
         });
         editDescriptionInput.value = "";
         editDescriptionInput.value = "";
-        preUpdate();
+        preUpdate(listArray);
         exitPopup();
         editPopupElement.classList.remove("show");
         init();
@@ -104,7 +107,7 @@ favoriteButtonElement.addEventListener("click", () => {
     else {
         dropdownFavorite.classList.remove("fill");
     }
-    preUpdate();
+    preUpdate(listArray);
     init();
 });
 duplicateButtonElement.addEventListener("click", () => {
@@ -114,7 +117,7 @@ duplicateButtonElement.addEventListener("click", () => {
     counter++;
     let duplicateInfo = createListElement(counter, item.title, item.description, date, item.favorite);
     listArray.push(duplicateInfo);
-    preUpdate();
+    preUpdate(listArray);
 });
 deleteButtonElement.addEventListener("click", () => {
     deletePopupElement.classList.add("show");
@@ -126,8 +129,9 @@ deleteSubmitButtonElement.addEventListener("click", (e) => {
     listArray = listArray.filter((listItem) => listItem.id != Number(id));
     exitPopup();
     deletePopupElement.classList.remove("show");
-    preUpdate();
-    init();
+    listHeaderElement.removeAttribute("data-id");
+    preUpdate(listArray);
+    listsInit(listArray);
     hideDropDown();
 });
 deleteCancelElement.addEventListener("click", (e) => {
@@ -155,6 +159,12 @@ function createListElement(id, header, description, date, favorite) {
     itemContainer.classList.add("lists-list-element");
     listHeader.innerText = header;
     listHeader.setAttribute("data-list-id", id.toString());
+    itemContainer.addEventListener("click", () => {
+        setListId(id);
+        listHeaderElement.innerText = header;
+        listAddedElement.innerText = calculateTimeSince(new Date(date).getTime());
+        itemInit();
+    });
     itemContainer.append(listHeader, openDropDownButtonElement);
     listsList.appendChild(itemContainer);
     let itemContainerRect = itemContainer.getBoundingClientRect();
@@ -185,7 +195,7 @@ function createFavoriteElement(id, header, favorite) {
             }
             return item;
         });
-        preUpdate();
+        preUpdate(listArray);
         init();
     });
     itemContainerElement.append(favoriteHeaderElement, favoriteIconElement);
@@ -227,25 +237,6 @@ function favoriteFill(favorite) {
         document.querySelector(".dropdown-favorite").classList.remove("fill");
     }
 }
-function calculateTimeSince(timestamp) {
-    const timeElapsed = Date.now() - timestamp;
-    const days = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((timeElapsed / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((timeElapsed / 1000 / 60) % 60);
-    const seconds = Math.floor((timeElapsed / 1000) % 60);
-    if (days > 1) {
-        return `${days} days ago`;
-    }
-    else if (hours > 1) {
-        return `${minutes} minutes ago`;
-    }
-    else if (seconds > 1) {
-        return `${seconds} seconds ago`;
-    }
-    else {
-        return "now";
-    }
-}
 function init() {
     if (!window.localStorage.getItem("list")) {
         window.localStorage.setItem("list", "");
@@ -260,11 +251,13 @@ function init() {
 }
 function listsInit(tempListArr) {
     listsList.innerHTML = "";
-    counter = tempListArr.slice(-1)[0].id + 1;
-    listArray = tempListArr;
-    tempListArr.forEach((element) => {
-        createListElement(element.id, element.title, element.description, element.date, element.favorite);
-    });
+    if (tempListArr.length > 0) {
+        counter = tempListArr.slice(-1)[0].id + 1;
+        listArray = tempListArr;
+        tempListArr.forEach((element) => {
+            createListElement(element.id, element.title, element.description, element.date, element.favorite);
+        });
+    }
 }
 function favoritesInit(tempListArr) {
     favoritesList.innerHTML = "";
@@ -274,11 +267,11 @@ function favoritesInit(tempListArr) {
         }
     });
 }
+function setListId(id) {
+    listHeaderElement.setAttribute("data-id", id.toString());
+}
 function hideDropDown() {
     dropDownElement.classList.add("hide");
-}
-function preUpdate() {
-    window.localStorage.setItem("list", JSON.stringify(listArray));
 }
 function exitPopup() {
     overlayElement.classList.remove("show");

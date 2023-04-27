@@ -54,43 +54,46 @@
 				<div class="items-container">
 					<div class="list-main">
 						<div class="list-header">
-							<h2>Inbox</h2>
-							<i class="fa-solid fa-trash"></i>
+							<h2 class="list-name"></h2>
+							<small class="list-added-since"></small>
 						</div>
-						<div class="item-input">
-							<input type="text" placeholder="Task name" />
-							<textarea placeholder="Task Description"></textarea>
+						<div class="create-task">
+							<i
+								class="fa-solid fa-plus add-task"
+								aria-label="Add List"
+							>
+							</i>
+							<h4>Add task</h4>
+						</div>
+
+						<form class="item-form hide">
+							<input
+								type="text"
+								placeholder="Task name"
+								name="task_name"
+							/>
+							<textarea
+								placeholder="Task Description"
+								name="task_description"
+							></textarea>
 
 							<div class="item-button-group">
-								<button class="button">Cancel</button>
-								<button class="button submit-button">
+								<button class="button task-cancel">
+									Cancel
+								</button>
+								<button class="button submit-button task-add">
 									Add
 								</button>
 							</div>
-						</div>
+						</form>
 					</div>
 					<ul class="items-list">
-						<li class="item">
-							<input type="checkbox" checked />
-							<h5>title</h5>
-							<small>
-								Lorem ipsum dolor sit amet consectetur
-							</small>
-						</li>
+					
 					</ul>
 				</div>
 			</main>
 		</div>
 
-		<div class="splash-screen">
-			<div class="splash-screen-content">
-				<h1 class="splash-screen-header">
-					<span class="logo splash-screen-element">To</span>
-					<span class="logo splash-screen-element">Do.</span>
-				</h1>
-				<h4 class="splash-screen-element">Plan Out Your Day!</h4>
-			</div>
-		</div>
 		<div class="popup create-popup">
 			<h1>Add list</h1>
 			<form class="form-wrapper">
@@ -187,13 +190,19 @@
 		</div>
 
 		<div class="overlay"></div>
+
+		<!-- <div class="splash-screen">
+			<div class="splash-screen-content">
+				<h1 class="splash-screen-header">
+					<span class="logo splash-screen-element">To</span>
+					<span class="logo splash-screen-element">Do.</span>
+				</h1>
+				<h4 class="splash-screen-element">Plan Out Your Day!</h4>
+			</div>
+		</div> -->
 		<footer>
-			<script>
-				let exports = {};
-			</script>
-			<script src="./src/js/splashScreen.js"></script>
-			<script src="./src/js/lists.js"></script>
-			<script src="./src/js/item.js"></script>
+			<!-- <script src="./src/js/main/splashScreen.js"></script> -->
+			<script type="module" src="src/js/main/lists.js"></script>
 		</footer>
 	</body>
 </html>

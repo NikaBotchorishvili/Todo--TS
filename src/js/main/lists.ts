@@ -1,72 +1,55 @@
-import {List, ListItem} from "./types/Types"
-
+import { List } from "../types/Types";
+import { itemInit } from "./item.js";
+import { preUpdate, calculateTimeSince } from "../helpers/helpers.js";
 // 	Overlay for blurring
-const overlayElement = document.querySelector(".overlay") as HTMLElement;
 
-const listsList = document.querySelector(".lists-list") as HTMLElement;
-const favoritesList = document.querySelector(".favorites-list") as HTMLElement;
+const $ = (selector: string) => document.querySelector(selector);
 
-const createItemPopupButtonElement = document.querySelector(
-	".open-create-popup"
-) as HTMLElement;
-const createPopupElement = document.querySelector(
-	".create-popup"
-) as HTMLElement;
-const createListButton = document.querySelector(".create-list");
-const cancelListCreateElement = document.querySelector(
-	".create-cancel"
-) as HTMLElement;
+const overlayElement = $(".overlay") as HTMLElement;
 
-const headerInputElement = document.querySelector(
-	"input[name=header_input]"
-) as HTMLInputElement;
-const descriptionInputElement = document.querySelector(
+const listsList = $(".lists-list") as HTMLElement;
+const favoritesList = $(".favorites-list") as HTMLElement;
+
+const createItemPopupButtonElement = $(".open-create-popup") as HTMLElement;
+const createPopupElement = $(".create-popup") as HTMLElement;
+const createListButton = $(".create-list");
+const cancelListCreateElement = $(".create-cancel") as HTMLElement;
+
+const headerInputElement = $("input[name=header_input]") as HTMLInputElement;
+const descriptionInputElement = $(
 	"textarea[name=description_input]"
 ) as HTMLInputElement;
 
-const asideElement = document.querySelector("aside");
-const menuElement = document.querySelector(".fa-bars") as HTMLElement;
+const asideElement = $("aside");
+const menuElement = $(".fa-bars") as HTMLElement;
 
-const expandList = document.querySelector(".expand-list") as HTMLElement;
-const expandFavorites = document.querySelector(
-	".expand-favorites"
-) as HTMLElement;
+const expandList = $(".expand-list") as HTMLElement;
+const expandFavorites = $(".expand-favorites") as HTMLElement;
 
-const dropDownElement = document.querySelector(".dropdown") as HTMLElement;
+const dropDownElement = $(".dropdown") as HTMLElement;
 
-const editButtonElement = document.querySelector(".edit") as HTMLElement;
-const editPopupElement = document.querySelector(".edit-popup") as HTMLElement;
-const editHeaderInputElement = document.querySelector(
+const editButtonElement = $(".edit") as HTMLElement;
+const editPopupElement = $(".edit-popup") as HTMLElement;
+const editHeaderInputElement = $(
 	"input[name=edit_header_input]"
 ) as HTMLInputElement;
-const editDescriptionInput = document.querySelector(
+const editDescriptionInput = $(
 	"textarea[name=edit_description_input]"
 ) as HTMLInputElement;
 
-const editCancelButton = document.querySelector(
-	".edit-cancel"
-) as HTMLButtonElement;
-const editSubmitButton = document.querySelector(
-	".edit-list"
-) as HTMLButtonElement;
+const editCancelButton = $(".edit-cancel") as HTMLButtonElement;
+const editSubmitButton = $(".edit-list") as HTMLButtonElement;
 
-const favoriteButtonElement = document.querySelector(
-	".favorite"
-) as HTMLElement;
-const duplicateButtonElement = document.querySelector(
-	".duplicate"
-) as HTMLElement;
+const favoriteButtonElement = $(".favorite") as HTMLElement;
+const duplicateButtonElement = $(".duplicate") as HTMLElement;
 
-const deleteButtonElement = document.querySelector(".delete") as HTMLElement;
-const deleteSubmitButtonElement = document.querySelector(
-	".delete-list"
-) as HTMLElement;
-const deletePopupElement = document.querySelector(
-	".delete-popup"
-) as HTMLElement;
-const deleteCancelElement = document.querySelector(
-	".delete-cancel"
-) as HTMLElement;
+const deleteButtonElement = $(".delete") as HTMLElement;
+const deleteSubmitButtonElement = $(".delete-list") as HTMLElement;
+const deletePopupElement = $(".delete-popup") as HTMLElement;
+const deleteCancelElement = $(".delete-cancel") as HTMLElement;
+
+const listHeaderElement = $(".list-name") as HTMLElement;
+const listAddedElement = $(".list-added-since") as HTMLElement;
 
 let lastToggledDropDown = 0;
 
@@ -90,7 +73,7 @@ createListButton?.addEventListener("click", (e) => {
 	let date = new Date();
 	let headerInputValue = headerInputElement.value.trim();
 	let descriptionInputValue = descriptionInputElement.value.trim();
-	if (headerInputValue != "" && descriptionInputValue != "") {
+	if (headerInputValue != "") {
 		let todoInfo = createListElement(
 			counter,
 			headerInputValue,
@@ -100,7 +83,7 @@ createListButton?.addEventListener("click", (e) => {
 		);
 
 		listArray.push(todoInfo);
-		preUpdate();
+		preUpdate(listArray);
 		headerInputElement.value = "";
 		descriptionInputElement.value = "";
 		createPopupElement.classList.remove("show");
@@ -145,7 +128,7 @@ editSubmitButton.addEventListener("click", (e) => {
 
 		editDescriptionInput.value = "";
 		editDescriptionInput.value = "";
-		preUpdate();
+		preUpdate(listArray);
 
 		exitPopup();
 		editPopupElement.classList.remove("show");
@@ -154,7 +137,7 @@ editSubmitButton.addEventListener("click", (e) => {
 });
 favoriteButtonElement.addEventListener("click", () => {
 	let id = dropDownElement.dataset.id;
-	let dropdownFavorite = document.querySelector(".dropdown-favorite")
+	let dropdownFavorite = document.querySelector(".dropdown-favorite");
 	listArray = listArray.map((listItem): List => {
 		if (listItem.id == Number(id)) {
 			return { ...listItem, favorite: !listItem.favorite };
@@ -170,7 +153,7 @@ favoriteButtonElement.addEventListener("click", () => {
 	} else {
 		dropdownFavorite.classList.remove("fill");
 	}
-	preUpdate();
+	preUpdate(listArray);
 	init();
 });
 
@@ -187,7 +170,7 @@ duplicateButtonElement.addEventListener("click", () => {
 		item.favorite
 	);
 	listArray.push(duplicateInfo);
-	preUpdate();
+	preUpdate(listArray);
 });
 
 deleteButtonElement.addEventListener("click", () => {
@@ -202,8 +185,9 @@ deleteSubmitButtonElement.addEventListener("click", (e) => {
 	listArray = listArray.filter((listItem) => listItem.id != Number(id));
 	exitPopup();
 	deletePopupElement.classList.remove("show");
-	preUpdate();
-	init();
+	listHeaderElement.removeAttribute("data-id");
+	preUpdate(listArray);
+	listsInit(listArray);
 	hideDropDown();
 });
 
@@ -244,7 +228,12 @@ function createListElement(
 	listHeader.innerText = header;
 	listHeader.setAttribute("data-list-id", id.toString());
 
-
+	itemContainer.addEventListener("click", () => {
+		setListId(id);
+		listHeaderElement.innerText = header;
+		listAddedElement.innerText = calculateTimeSince(new Date(date).getTime());
+		itemInit();
+	});
 	itemContainer.append(listHeader, openDropDownButtonElement);
 
 	listsList.appendChild(itemContainer);
@@ -281,7 +270,7 @@ function createFavoriteElement(id: number, header: string, favorite: boolean) {
 			}
 			return item;
 		});
-		preUpdate();
+		preUpdate(listArray);
 
 		init();
 	});
@@ -310,8 +299,8 @@ function OpenDropDownHandler(
 						el.removeAttribute("data-toggled");
 					}
 				});
-			
-			favoriteFill(favorite)
+
+			favoriteFill(favorite);
 			dropDownElement.setAttribute("data-id", datasetId);
 			lastToggledDropDown = id;
 
@@ -328,27 +317,8 @@ function OpenDropDownHandler(
 function favoriteFill(favorite: boolean): void {
 	if (favorite) {
 		document.querySelector(".dropdown-favorite").classList.add("fill");
-	}else{
-		document.querySelector(".dropdown-favorite").classList.remove("fill");
-	}
-}
-
-function calculateTimeSince(timestamp: number) {
-	const timeElapsed = Date.now() - timestamp;
-
-	const days = Math.floor(timeElapsed / (1000 * 60 * 60 * 24));
-	const hours = Math.floor((timeElapsed / (1000 * 60 * 60)) % 24);
-	const minutes = Math.floor((timeElapsed / 1000 / 60) % 60);
-	const seconds = Math.floor((timeElapsed / 1000) % 60);
-
-	if (days > 1) {
-		return `${days} days ago`;
-	} else if (hours > 1) {
-		return `${minutes} minutes ago`;
-	} else if (seconds > 1) {
-		return `${seconds} seconds ago`;
 	} else {
-		return "now";
+		document.querySelector(".dropdown-favorite").classList.remove("fill");
 	}
 }
 
@@ -368,17 +338,19 @@ function init() {
 
 function listsInit(tempListArr: List[]): void {
 	listsList.innerHTML = "";
-	counter = tempListArr.slice(-1)[0].id + 1;
-	listArray = tempListArr;
-	tempListArr.forEach((element: List) => {
-		createListElement(
-			element.id,
-			element.title,
-			element.description,
-			element.date,
-			element.favorite
-		);
-	});
+	if (tempListArr.length > 0) {
+		counter = tempListArr.slice(-1)[0].id + 1;
+		listArray = tempListArr;
+		tempListArr.forEach((element: List) => {
+			createListElement(
+				element.id,
+				element.title,
+				element.description,
+				element.date,
+				element.favorite
+			);
+		});
+	}
 }
 
 function favoritesInit(tempListArr: List[]): void {
@@ -390,12 +362,12 @@ function favoritesInit(tempListArr: List[]): void {
 	});
 }
 
-function hideDropDown(): void {
-	dropDownElement.classList.add("hide");
+function setListId(id: number) {
+	listHeaderElement.setAttribute("data-id", id.toString());
 }
 
-function preUpdate(): void {
-	window.localStorage.setItem("list", JSON.stringify(listArray));
+function hideDropDown(): void {
+	dropDownElement.classList.add("hide");
 }
 
 function exitPopup(): void {
