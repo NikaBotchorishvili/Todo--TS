@@ -18,7 +18,7 @@ import {
 
 const listsList = $(".lists-list") as HTMLElement;
 const favoritesList = $(".favorites-list") as HTMLElement;
-
+const itemsContainer = $(".items-container") as HTMLElement
 const createItemPopupButtonElement = $(".open-create-popup") as HTMLElement;
 const createPopupElement = $(".create-popup") as HTMLElement;
 const createListButton = $(".create-list");
@@ -74,6 +74,20 @@ overlayElement.addEventListener("click", () => {
 			exitPopup()
 		}
 	})	
+})
+itemsContainer.addEventListener("click", () => {
+	if(!dropDownElement.classList.contains("hide")){
+		hideDropDown();
+		dropDownElement.removeAttribute("data-id");
+		document
+		.querySelectorAll(".fa-ellipsis")
+		.forEach((el: HTMLElement) => {
+			if (el.hasAttribute("data-toggled")) {
+				el.removeAttribute("data-toggled");
+			}
+		});
+		
+	}
 })
 expandList.addEventListener("click", () => expandListHandler());
 

@@ -3,6 +3,7 @@ import { preUpdate, calculateTimeSince, $, getList, setListId, hideDropDown, exi
 import { expandListHandler, expandFavoritesHandler, menuElementHandler, } from "../handlers/listsHandlers.js";
 const listsList = $(".lists-list");
 const favoritesList = $(".favorites-list");
+const itemsContainer = $(".items-container");
 const createItemPopupButtonElement = $(".open-create-popup");
 const createPopupElement = $(".create-popup");
 const createListButton = $(".create-list");
@@ -39,6 +40,19 @@ overlayElement.addEventListener("click", () => {
             exitPopup();
         }
     });
+});
+itemsContainer.addEventListener("click", () => {
+    if (!dropDownElement.classList.contains("hide")) {
+        hideDropDown();
+        dropDownElement.removeAttribute("data-id");
+        document
+            .querySelectorAll(".fa-ellipsis")
+            .forEach((el) => {
+            if (el.hasAttribute("data-toggled")) {
+                el.removeAttribute("data-toggled");
+            }
+        });
+    }
 });
 expandList.addEventListener("click", () => expandListHandler());
 expandFavorites.addEventListener("click", () => expandFavoritesHandler());
