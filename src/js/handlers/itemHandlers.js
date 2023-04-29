@@ -21,3 +21,22 @@ export function checkBoxHandler(id) {
     preUpdate(lists);
     itemInit();
 }
+export function deleteHandler(id) {
+    let listId = Number(listNameElement.dataset.id);
+    let lists = getList();
+    let items = lists
+        .find((l) => (l.id = listId))
+        .items.filter((item) => {
+        if (item.id != id) {
+            return item;
+        }
+    });
+    lists = lists.map((list) => {
+        if (list.id == listId) {
+            return Object.assign(Object.assign({}, list), { items: items });
+        }
+        return list;
+    });
+    preUpdate(lists);
+    itemInit();
+}

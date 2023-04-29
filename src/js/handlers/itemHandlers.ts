@@ -27,3 +27,27 @@ export function checkBoxHandler(id: number) {
 	preUpdate(lists);
 	itemInit();
 }
+
+export function deleteHandler(id : number) {
+	let listId = Number(listNameElement.dataset.id);
+
+	let lists: List[] = getList();
+
+	let items = lists
+		.find((l) => (l.id = listId))
+		.items.filter((item) => {
+			if (item.id != id) {
+				return item;
+			}
+		});
+
+	lists = lists.map((list) => {
+		if (list.id == listId) {
+			return { ...list, items: items };
+		}
+		return list;
+	});
+
+	preUpdate(lists);
+	itemInit();
+}
