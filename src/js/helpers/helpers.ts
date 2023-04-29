@@ -37,7 +37,7 @@ export function preUpdate(listArray: List[]): void {
 	window.localStorage.setItem("list", JSON.stringify(listArray));
 }
 
-export const getList = (): List[] =>  JSON.parse(localStorage.getItem("list"));
+export const getList = (): List[] => JSON.parse(localStorage.getItem("list"));
 
 
 export function setListId(id: number) {
@@ -53,4 +53,5 @@ export function exitPopup(): void {
 }
 export function enterPopup(): void {
 	overlayElement.classList.toggle("show");
+	console.log("hgsui")
 }

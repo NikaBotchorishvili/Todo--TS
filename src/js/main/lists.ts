@@ -59,26 +59,35 @@ const expandList = $(".expand-list") as HTMLElement;
 const expandFavorites = $(".expand-favorites") as HTMLElement;
 const menuElement = $(".fa-bars") as HTMLElement;
 
+const overlayElement = $(".overlay") as HTMLElement;
+
 let lastToggledDropDown = 0;
 
 let listArray: List[] = [];
 let counter: number = 1;
 
 init();
+overlayElement.addEventListener("click", () => {
+	document.querySelectorAll(".popup").forEach((popup) => {
+		if(popup.classList.contains("slide-from-top")){
+			popup.classList.remove("slide-from-top");
+			exitPopup()
+		}
+	})	
+})
+expandList.addEventListener("click", () => expandListHandler());
 
-expandList.addEventListener("click", () => expandListHandler);
+expandFavorites.addEventListener("click", () => expandFavoritesHandler());
 
-expandFavorites.addEventListener("click", () => expandFavoritesHandler);
-
-menuElement.addEventListener("click", () => menuElementHandler);
+menuElement.addEventListener("click", () => menuElementHandler());
 
 createItemPopupButtonElement.addEventListener("click", () => {
-	createPopupElement.classList.add("show");
+	createPopupElement.classList.add("slide-from-top");
 	enterPopup();
 });
 
 cancelListCreateElement.addEventListener("click", () => {
-	createPopupElement.classList.remove("show");
+	createPopupElement.classList.remove("slide-from-top");
 	exitPopup();
 });
 
@@ -101,7 +110,7 @@ createListButton?.addEventListener("click", (e) => {
 		preUpdate(listArray);
 		headerInputElement.value = "";
 		descriptionInputElement.value = "";
-		createPopupElement.classList.remove("show");
+		createPopupElement.classList.remove("slide-from-top");
 		exitPopup();
 		counter++;
 	}
@@ -109,7 +118,7 @@ createListButton?.addEventListener("click", (e) => {
 
 editButtonElement.addEventListener("click", () => {
 	let id = dropDownElement.dataset.id;
-	editPopupElement.classList.add("show");
+	editPopupElement.classList.add("slide-from-top");
 	let item = listArray.filter((listItem) => listItem.id == Number(id))[0];
 	editHeaderInputElement.value = item.title;
 	editDescriptionInput.value = item.description;
@@ -121,7 +130,7 @@ editCancelButton.addEventListener("click", (e) => {
 	e.preventDefault();
 	exitPopup();
 	hideDropDown();
-	editPopupElement.classList.remove("show");
+	editPopupElement.classList.remove("slide-from-top");
 });
 
 editSubmitButton.addEventListener("click", (e) => {
@@ -147,7 +156,7 @@ editSubmitButton.addEventListener("click", (e) => {
 		preUpdate(listArray);
 
 		exitPopup();
-		editPopupElement.classList.remove("show");
+		editPopupElement.classList.remove("slide-from-top");
 		init();
 	}
 });
@@ -193,7 +202,7 @@ duplicateButtonElement.addEventListener("click", () => {
 });
 
 deleteButtonElement.addEventListener("click", () => {
-	deletePopupElement.classList.add("show");
+	deletePopupElement.classList.add("slide-from-top");
 	hideDropDown();
 	enterPopup();
 });
@@ -204,7 +213,7 @@ deleteSubmitButtonElement.addEventListener("click", (e) => {
 	let id = dropDownElement.dataset.id;
 	listArray = listArray.filter((listItem) => listItem.id != Number(id));
 	exitPopup();
-	deletePopupElement.classList.remove("show");
+	deletePopupElement.classList.remove("slide-from-top");
 	listHeaderElement.removeAttribute("data-id");
 	preUpdate(listArray);
 	listsInit(listArray);
@@ -213,7 +222,7 @@ deleteSubmitButtonElement.addEventListener("click", (e) => {
 
 deleteCancelElement.addEventListener("click", (e) => {
 	e.preventDefault();
-	deletePopupElement.classList.remove("show");
+	deletePopupElement.classList.remove("slide-from-top");
 	exitPopup();
 });
 
@@ -351,7 +360,7 @@ function favoriteFill(favorite: boolean): void {
 
 function init() {
 	if (!getList()) {
-		window.localStorage.setItem("list", "");
+		window.localStorage.setItem("list", "[]");
 	} else {
 		const temporaryListArray: List[] = getList();
 		if (temporaryListArray.length > 0) {

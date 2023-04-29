@@ -27,19 +27,28 @@ const listAddedElement = $(".list-added-since");
 const expandList = $(".expand-list");
 const expandFavorites = $(".expand-favorites");
 const menuElement = $(".fa-bars");
+const overlayElement = $(".overlay");
 let lastToggledDropDown = 0;
 let listArray = [];
 let counter = 1;
 init();
-expandList.addEventListener("click", () => expandListHandler);
-expandFavorites.addEventListener("click", () => expandFavoritesHandler);
-menuElement.addEventListener("click", () => menuElementHandler);
+overlayElement.addEventListener("click", () => {
+    document.querySelectorAll(".popup").forEach((popup) => {
+        if (popup.classList.contains("slide-from-top")) {
+            popup.classList.remove("slide-from-top");
+            exitPopup();
+        }
+    });
+});
+expandList.addEventListener("click", () => expandListHandler());
+expandFavorites.addEventListener("click", () => expandFavoritesHandler());
+menuElement.addEventListener("click", () => menuElementHandler());
 createItemPopupButtonElement.addEventListener("click", () => {
-    createPopupElement.classList.add("show");
+    createPopupElement.classList.add("slide-from-top");
     enterPopup();
 });
 cancelListCreateElement.addEventListener("click", () => {
-    createPopupElement.classList.remove("show");
+    createPopupElement.classList.remove("slide-from-top");
     exitPopup();
 });
 createListButton === null || createListButton === void 0 ? void 0 : createListButton.addEventListener("click", (e) => {
@@ -53,14 +62,14 @@ createListButton === null || createListButton === void 0 ? void 0 : createListBu
         preUpdate(listArray);
         headerInputElement.value = "";
         descriptionInputElement.value = "";
-        createPopupElement.classList.remove("show");
+        createPopupElement.classList.remove("slide-from-top");
         exitPopup();
         counter++;
     }
 });
 editButtonElement.addEventListener("click", () => {
     let id = dropDownElement.dataset.id;
-    editPopupElement.classList.add("show");
+    editPopupElement.classList.add("slide-from-top");
     let item = listArray.filter((listItem) => listItem.id == Number(id))[0];
     editHeaderInputElement.value = item.title;
     editDescriptionInput.value = item.description;
@@ -71,7 +80,7 @@ editCancelButton.addEventListener("click", (e) => {
     e.preventDefault();
     exitPopup();
     hideDropDown();
-    editPopupElement.classList.remove("show");
+    editPopupElement.classList.remove("slide-from-top");
 });
 editSubmitButton.addEventListener("click", (e) => {
     e.preventDefault();
@@ -88,7 +97,7 @@ editSubmitButton.addEventListener("click", (e) => {
         editDescriptionInput.value = "";
         preUpdate(listArray);
         exitPopup();
-        editPopupElement.classList.remove("show");
+        editPopupElement.classList.remove("slide-from-top");
         init();
     }
 });
@@ -123,7 +132,7 @@ duplicateButtonElement.addEventListener("click", () => {
     preUpdate(listArray);
 });
 deleteButtonElement.addEventListener("click", () => {
-    deletePopupElement.classList.add("show");
+    deletePopupElement.classList.add("slide-from-top");
     hideDropDown();
     enterPopup();
 });
@@ -132,7 +141,7 @@ deleteSubmitButtonElement.addEventListener("click", (e) => {
     let id = dropDownElement.dataset.id;
     listArray = listArray.filter((listItem) => listItem.id != Number(id));
     exitPopup();
-    deletePopupElement.classList.remove("show");
+    deletePopupElement.classList.remove("slide-from-top");
     listHeaderElement.removeAttribute("data-id");
     preUpdate(listArray);
     listsInit(listArray);
@@ -140,7 +149,7 @@ deleteSubmitButtonElement.addEventListener("click", (e) => {
 });
 deleteCancelElement.addEventListener("click", (e) => {
     e.preventDefault();
-    deletePopupElement.classList.remove("show");
+    deletePopupElement.classList.remove("slide-from-top");
     exitPopup();
 });
 function createListElement(id, header, description, date, favorite, items) {
@@ -246,7 +255,7 @@ function favoriteFill(favorite) {
 }
 function init() {
     if (!getList()) {
-        window.localStorage.setItem("list", "");
+        window.localStorage.setItem("list", "[]");
     }
     else {
         const temporaryListArray = getList();

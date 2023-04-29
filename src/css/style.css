@@ -102,7 +102,6 @@ header {
 	top: 0;
 	overflow-y: scroll;
 	padding: 0 10px;
-
 }
 
 .sidebar-container {
@@ -111,7 +110,6 @@ header {
 	align-items: center;
 	gap: 40px;
 	height: 100%;
-
 }
 
 .lists {
@@ -120,7 +118,6 @@ header {
 	flex-direction: column;
 	gap: 10px;
 	margin-top: 40px;
-
 }
 
 .lists-actions {
@@ -187,7 +184,6 @@ header {
 .create-popup {
 	width: 550px;
 	height: 550px;
-	display: none;
 	justify-content: space-between;
 	flex-direction: column;
 }
@@ -274,13 +270,11 @@ header {
 .delete-popup {
 	width: 400px;
 	height: 250px;
-	display: none;
-
+	display: flex;
 	gap: 30px;
 }
 
 .edit-popup {
-	display: none;
 	width: 550px;
 	height: 500px;
 }
@@ -328,7 +322,7 @@ header {
 	margin-top: 20px;
 	gap: 5px;
 }
-.lists-list-name{
+.lists-list-name {
 	cursor: pointer;
 }
 .list-header {
@@ -422,4 +416,25 @@ textarea:focus {
 	display: flex;
 	width: 10%;
 	justify-content: space-between;
+}
+
+@media only screen and (max-width: 900px) {
+	.list-main {
+		width: 100%;
+	}
+
+	.item {
+		width: 80%;
+	}
+}
+
+@media only screen and (max-width: 700px) {
+	.create-popup {
+		width: 500px;
+		height: 500px;
+	}
+	.edit-popup{
+		width: 500px;
+		height: 500px;
+	}
 }

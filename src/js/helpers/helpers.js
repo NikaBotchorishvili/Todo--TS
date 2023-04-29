@@ -38,4 +38,5 @@ export function exitPopup() {
 }
 export function enterPopup() {
     overlayElement.classList.toggle("show");
+    console.log("hgsui");
 }
