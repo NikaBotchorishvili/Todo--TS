@@ -1,10 +1,13 @@
 import { List } from "../types/Types";
 import { itemInit } from "./item.js";
-import { preUpdate, calculateTimeSince } from "../helpers/helpers.js";
+import {
+	preUpdate,
+	calculateTimeSince,
+	$,
+	getList,
+} from "../helpers/helpers.js";
+
 // 	Overlay for blurring
-
-const $ = (selector: string) => document.querySelector(selector);
-
 const overlayElement = $(".overlay") as HTMLElement;
 
 const listsList = $(".lists-list") as HTMLElement;
@@ -221,7 +224,7 @@ function createListElement(
 	const itemContainer = document.createElement("li");
 	const listHeader = document.createElement("h4");
 	const openDropDownButtonElement = document.createElement("i");
-	listHeader.classList.add("lists-list-name")
+	listHeader.classList.add("lists-list-name");
 	openDropDownButtonElement.classList.add("fa-solid", "fa-ellipsis");
 	openDropDownButtonElement.setAttribute("data-id", id.toString());
 
@@ -232,7 +235,9 @@ function createListElement(
 	listHeader.addEventListener("click", () => {
 		setListId(id);
 		listHeaderElement.innerText = header;
-		listAddedElement.innerText = calculateTimeSince(new Date(date).getTime());
+		listAddedElement.innerText = calculateTimeSince(
+			new Date(date).getTime()
+		);
 		itemInit();
 	});
 	itemContainer.append(listHeader, openDropDownButtonElement);
@@ -324,12 +329,10 @@ function favoriteFill(favorite: boolean): void {
 }
 
 function init() {
-	if (!window.localStorage.getItem("list")) {
+	if (!getList()) {
 		window.localStorage.setItem("list", "");
 	} else {
-		const temporaryListArray: List[] = JSON.parse(
-			window.localStorage.getItem("list") || ""
-		);
+		const temporaryListArray: List[] = getList();
 		if (temporaryListArray.length > 0) {
 			listsInit(temporaryListArray);
 			favoritesInit(temporaryListArray);

@@ -1,6 +1,5 @@
 import { itemInit } from "./item.js";
-import { preUpdate, calculateTimeSince } from "../helpers/helpers.js";
-const $ = (selector) => document.querySelector(selector);
+import { preUpdate, calculateTimeSince, $, getList, } from "../helpers/helpers.js";
 const overlayElement = $(".overlay");
 const listsList = $(".lists-list");
 const favoritesList = $(".favorites-list");
@@ -239,11 +238,11 @@ function favoriteFill(favorite) {
     }
 }
 function init() {
-    if (!window.localStorage.getItem("list")) {
+    if (!getList()) {
         window.localStorage.setItem("list", "");
     }
     else {
-        const temporaryListArray = JSON.parse(window.localStorage.getItem("list") || "");
+        const temporaryListArray = getList();
         if (temporaryListArray.length > 0) {
             listsInit(temporaryListArray);
             favoritesInit(temporaryListArray);

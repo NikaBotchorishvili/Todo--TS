@@ -22,3 +22,5 @@ export function calculateTimeSince(date) {
 export function preUpdate(listArray) {
     window.localStorage.setItem("list", JSON.stringify(listArray));
 }
+export const $ = (selector) => document.querySelector(selector);
+export const getList = () => JSON.parse(localStorage.getItem("list"));

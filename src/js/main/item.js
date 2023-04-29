@@ -1,5 +1,5 @@
-import { preUpdate } from "../helpers/helpers.js";
-const $ = (selector) => document.querySelector(selector);
+import { preUpdate, $, getList } from "../helpers/helpers.js";
+import { checkBoxHandler } from "../handlers/itemHandlers.js";
 const itemFormElement = $(".item-form");
 const createTaskButtonElement = $(".create-task");
 const createTaskCancelButtonElement = $(".task-cancel");
@@ -35,7 +35,7 @@ taskAddSubmitButtonElement.addEventListener("click", (e) => {
         };
         taskNameInputElement.value = "";
         taskDescInputElement.value = "";
-        let lists = JSON.parse(localStorage.getItem("list"));
+        let lists = getList();
         let newListsArr = lists.map((list) => {
             if (listId === list.id) {
                 return Object.assign(Object.assign({}, list), { items: [...list.items, item] });
@@ -63,34 +63,35 @@ function createItemElement(listProp) {
     deleteButton.classList.add("fa-solid", "fa-trash");
     itemDescription.innerText = listProp.description;
     itemTitle.innerText = listProp.title;
+    if (listProp.completed)
+        itemTitle.classList.add("completed");
     checkBoxElement.type = "checkbox";
     checkBoxElement.checked = listProp.completed;
     itemContainer.classList.add("item");
-    checkBoxElement.addEventListener("click", () => {
-        let listId = Number(listNameElement.dataset.id);
-        let lists = JSON.parse(localStorage.getItem("list"));
-        let items = lists.find((l) => (l.id = listProp.id)).items;
-        items = items.map((item) => {
-            if (item.id === listProp.id) {
-                return Object.assign(Object.assign({}, item), { completed: !item.completed });
-            }
-            return item;
-        });
-        lists = lists.map((list) => {
-            if (list.id === listId) {
-                return Object.assign(Object.assign({}, list), { items: items });
-            }
-            return { list };
-        });
-        console.log(lists);
-        console.log(items);
-        preUpdate(lists);
-        itemInit();
-    });
     InfoContainer.append(checkBoxElement, itemTitle, itemDescription);
     actionContainer.append(editButton, deleteButton);
     itemContainer.append(InfoContainer, actionContainer);
     itemsListElement.append(itemContainer);
+    checkBoxElement.addEventListener("click", () => checkBoxHandler(listProp.id));
+    deleteButton.addEventListener("click", () => {
+        let listId = Number(listNameElement.dataset.id);
+        let lists = getList();
+        let items = lists
+            .find((l) => (l.id = listId))
+            .items.filter((item) => {
+            if (item.id != listProp.id) {
+                return item;
+            }
+        });
+        lists = lists.map((list) => {
+            if (list.id == listId) {
+                return Object.assign(Object.assign({}, list), { items: items });
+            }
+            return list;
+        });
+        preUpdate(lists);
+        itemInit();
+    });
 }
 export function itemInit() {
     let listId = listNameElement.hasAttribute("data-id")
@@ -99,7 +100,7 @@ export function itemInit() {
     if (listId != null) {
         createTaskButtonElement.classList.remove("hide");
         itemsListElement.innerHTML = "";
-        let lists = JSON.parse(localStorage.getItem("list"));
+        let lists = getList();
         let items = lists.find((list) => list.id == listId).items;
         if (items.length > 0) {
             items.forEach((item) => createItemElement(item));

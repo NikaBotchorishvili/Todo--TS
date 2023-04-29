@@ -30,3 +30,6 @@ export function calculateTimeSince(date: number) {
 export function preUpdate(listArray: List[]): void {
 	window.localStorage.setItem("list", JSON.stringify(listArray));
 }
+
+export const $ = (selector: string) => document.querySelector(selector);
+export const getList = (): List[] =>  JSON.parse(localStorage.getItem("list"));

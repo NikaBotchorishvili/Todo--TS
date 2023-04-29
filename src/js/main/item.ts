@@ -1,6 +1,6 @@
 import { ListItem, List } from "../types/Types";
-import { preUpdate } from "../helpers/helpers.js";
-const $ = (selector: string) => document.querySelector(selector);
+import { preUpdate, $, getList } from "../helpers/helpers.js";
+import { checkBoxHandler } from "../handlers/itemHandlers.js";
 
 const itemFormElement = $(".item-form") as HTMLFormElement;
 const createTaskButtonElement = $(".create-task") as HTMLElement;
@@ -47,7 +47,7 @@ taskAddSubmitButtonElement.addEventListener("click", (e) => {
 		taskNameInputElement.value = "";
 		taskDescInputElement.value = "";
 
-		let lists: List[] = JSON.parse(localStorage.getItem("list"));
+		let lists: List[] = getList();
 		let newListsArr = lists.map((list) => {
 			if (listId === list.id) {
 				return {
@@ -83,41 +83,45 @@ function createItemElement(listProp: ListItem) {
 	deleteButton.classList.add("fa-solid", "fa-trash");
 	itemDescription.innerText = listProp.description;
 	itemTitle.innerText = listProp.title;
+	if (listProp.completed) itemTitle.classList.add("completed");
 
 	checkBoxElement.type = "checkbox";
 	checkBoxElement.checked = listProp.completed;
 
 	itemContainer.classList.add("item");
 
-	checkBoxElement.addEventListener("click", () => {
-		let listId = Number(listNameElement.dataset.id);
-
-		let lists: List[] = JSON.parse(localStorage.getItem("list"));
-
-		let items = lists.find((l) => (l.id = listProp.id)).items;
-		items = items.map((item) => {
-			if (item.id === listProp.id) {
-				return { ...item, completed: !item.completed };
-			}
-			return item;
-		});
-
-		lists = lists.map((list: List) => {
-			if (list.id === listId) {
-				return { ...list, items: items };
-			}
-			return { list };
-		});
-		console.log(lists);
-		console.log(items);
-		preUpdate(lists);
-		itemInit();
-	});
-
 	InfoContainer.append(checkBoxElement, itemTitle, itemDescription);
 	actionContainer.append(editButton, deleteButton);
 	itemContainer.append(InfoContainer, actionContainer);
 	itemsListElement.append(itemContainer);
+
+	// 	Handlers
+	checkBoxElement.addEventListener("click", () =>
+		checkBoxHandler(listProp.id)
+	);
+	deleteButton.addEventListener("click", () => {
+		let listId = Number(listNameElement.dataset.id);
+
+		let lists: List[] = getList();
+
+		let items = lists
+			.find((l) => (l.id = listId))
+			.items.filter((item) => {
+				if (item.id != listProp.id) {
+					return item;
+				}
+			});
+
+		lists = lists.map((list) => {
+			if (list.id == listId) {
+				return { ...list, items: items };
+			}
+			return list;
+		});
+		
+		preUpdate(lists);
+		itemInit();
+	});
 }
 
 export function itemInit() {
@@ -129,7 +133,7 @@ export function itemInit() {
 		createTaskButtonElement.classList.remove("hide");
 
 		itemsListElement.innerHTML = "";
-		let lists: List[] = JSON.parse(localStorage.getItem("list"));
+		let lists: List[] = getList();
 		let items = lists.find((list) => list.id == listId).items;
 		if (items.length > 0) {
 			items.forEach((item) => createItemElement(item));
