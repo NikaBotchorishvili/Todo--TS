@@ -1,5 +1,11 @@
 import { List } from "../types/Types";
 
+export const $ = (selector: string) => document.querySelector(selector);
+
+const listHeaderElement = $(".list-name") as HTMLElement;
+const overlayElement = $(".overlay") as HTMLElement;
+const dropDownElement = $(".dropdown") as HTMLElement;
+
 export function calculateTimeSince(date: number) {
 	const seconds = Math.floor((Date.now() - date) / 1000);
   
@@ -31,5 +37,20 @@ export function preUpdate(listArray: List[]): void {
 	window.localStorage.setItem("list", JSON.stringify(listArray));
 }
 
-export const $ = (selector: string) => document.querySelector(selector);
 export const getList = (): List[] =>  JSON.parse(localStorage.getItem("list"));
+
+
+export function setListId(id: number) {
+	listHeaderElement.setAttribute("data-id", id.toString());
+}
+
+export function hideDropDown(): void {
+	dropDownElement.classList.add("hide");
+}
+
+export function exitPopup(): void {
+	overlayElement.classList.remove("show");
+}
+export function enterPopup(): void {
+	overlayElement.classList.toggle("show");
+}

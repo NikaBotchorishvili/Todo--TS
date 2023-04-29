@@ -1,14 +1,20 @@
-import { List } from "../types/Types";
+import { List, ListItem } from "../types/Types";
 import { itemInit } from "./item.js";
 import {
 	preUpdate,
 	calculateTimeSince,
 	$,
 	getList,
+	setListId,
+	hideDropDown,
+	exitPopup,
+	enterPopup,
 } from "../helpers/helpers.js";
-
-// 	Overlay for blurring
-const overlayElement = $(".overlay") as HTMLElement;
+import {
+	expandListHandler,
+	expandFavoritesHandler,
+	menuElementHandler,
+} from "../handlers/listsHandlers.js";
 
 const listsList = $(".lists-list") as HTMLElement;
 const favoritesList = $(".favorites-list") as HTMLElement;
@@ -23,12 +29,7 @@ const descriptionInputElement = $(
 	"textarea[name=description_input]"
 ) as HTMLInputElement;
 
-const asideElement = $("aside");
-const menuElement = $(".fa-bars") as HTMLElement;
-
-const expandList = $(".expand-list") as HTMLElement;
-const expandFavorites = $(".expand-favorites") as HTMLElement;
-
+// For now
 const dropDownElement = $(".dropdown") as HTMLElement;
 
 const editButtonElement = $(".edit") as HTMLElement;
@@ -54,12 +55,22 @@ const deleteCancelElement = $(".delete-cancel") as HTMLElement;
 const listHeaderElement = $(".list-name") as HTMLElement;
 const listAddedElement = $(".list-added-since") as HTMLElement;
 
+const expandList = $(".expand-list") as HTMLElement;
+const expandFavorites = $(".expand-favorites") as HTMLElement;
+const menuElement = $(".fa-bars") as HTMLElement;
+
 let lastToggledDropDown = 0;
 
 let listArray: List[] = [];
 let counter: number = 1;
 
 init();
+
+expandList.addEventListener("click", () => expandListHandler);
+
+expandFavorites.addEventListener("click", () => expandFavoritesHandler);
+
+menuElement.addEventListener("click", () => menuElementHandler);
 
 createItemPopupButtonElement.addEventListener("click", () => {
 	createPopupElement.classList.add("show");
@@ -82,7 +93,8 @@ createListButton?.addEventListener("click", (e) => {
 			headerInputValue,
 			descriptionInputValue,
 			date,
-			false
+			false,
+			[]
 		);
 
 		listArray.push(todoInfo);
@@ -101,6 +113,7 @@ editButtonElement.addEventListener("click", () => {
 	let item = listArray.filter((listItem) => listItem.id == Number(id))[0];
 	editHeaderInputElement.value = item.title;
 	editDescriptionInput.value = item.description;
+	hideDropDown();
 	enterPopup();
 });
 
@@ -165,19 +178,23 @@ duplicateButtonElement.addEventListener("click", () => {
 	let id = dropDownElement.dataset.id;
 	let item: List = listArray.filter((list) => list.id == Number(id))[0];
 	counter++;
+
 	let duplicateInfo = createListElement(
 		counter,
 		item.title,
 		item.description,
 		date,
-		item.favorite
+		item.favorite,
+		item.items
 	);
 	listArray.push(duplicateInfo);
+	hideDropDown();
 	preUpdate(listArray);
 });
 
 deleteButtonElement.addEventListener("click", () => {
 	deletePopupElement.classList.add("show");
+	hideDropDown();
 	enterPopup();
 });
 
@@ -200,29 +217,18 @@ deleteCancelElement.addEventListener("click", (e) => {
 	exitPopup();
 });
 
-expandList.addEventListener("click", () => {
-	expandList.classList.toggle("rotate");
-	listsList.classList.toggle("fade");
-});
-
-expandFavorites.addEventListener("click", () => {
-	expandFavorites.classList.toggle("rotate");
-	favoritesList.classList.toggle("fade");
-});
-
-menuElement.addEventListener("click", () => {
-	asideElement.classList.toggle("slide");
-});
-
 function createListElement(
 	id: number,
 	header: string,
 	description: string,
 	date: Date,
-	favorite: boolean
+	favorite: boolean,
+	items: ListItem[]
 ): List {
 	const itemContainer = document.createElement("li");
+	const listContainerHeader = document.createElement("div");
 	const listHeader = document.createElement("h4");
+	const addedDate = document.createElement("small");
 	const openDropDownButtonElement = document.createElement("i");
 	listHeader.classList.add("lists-list-name");
 	openDropDownButtonElement.classList.add("fa-solid", "fa-ellipsis");
@@ -230,6 +236,7 @@ function createListElement(
 
 	itemContainer.classList.add("lists-list-element");
 	listHeader.innerText = header;
+	addedDate.innerText = calculateTimeSince(new Date(date).getTime());
 	listHeader.setAttribute("data-list-id", id.toString());
 
 	listHeader.addEventListener("click", () => {
@@ -240,7 +247,8 @@ function createListElement(
 		);
 		itemInit();
 	});
-	itemContainer.append(listHeader, openDropDownButtonElement);
+	listContainerHeader.append(listHeader, addedDate);
+	itemContainer.append(listContainerHeader, openDropDownButtonElement);
 
 	listsList.appendChild(itemContainer);
 	let itemContainerRect = itemContainer.getBoundingClientRect();
@@ -254,21 +262,32 @@ function createListElement(
 		description: description,
 		date: date,
 		favorite: false,
-		items: [],
+		items: items,
 	};
 }
 
-function createFavoriteElement(id: number, header: string, favorite: boolean) {
+function createFavoriteElement(
+	id: number,
+	header: string,
+	favorite: boolean,
+	date: Date
+) {
 	const itemContainerElement = document.createElement("li");
 	const favoriteIconElement = document.createElement("i");
+	const listHeaderContainer = document.createElement("div");
 	const favoriteHeaderElement = document.createElement("h4");
-
+	const addedDate = document.createElement("small");
 	itemContainerElement.setAttribute("data-id", id.toString());
 
 	itemContainerElement.classList.add("list-favorite-element");
 	favoriteIconElement.classList.add("fa-solid", "fa-heart", "fill");
 	favoriteHeaderElement.innerText = header;
-
+	favoriteHeaderElement.style.cursor = "pointer";
+	favoriteHeaderElement.addEventListener("click", () => {
+		setListId(id);
+		itemInit();
+	});
+	addedDate.innerText = calculateTimeSince(new Date(date).getTime());
 	favoriteIconElement.addEventListener("click", () => {
 		listArray = listArray.map((item) => {
 			if (item.id == id) {
@@ -280,7 +299,9 @@ function createFavoriteElement(id: number, header: string, favorite: boolean) {
 
 		init();
 	});
-	itemContainerElement.append(favoriteHeaderElement, favoriteIconElement);
+	listHeaderContainer.append(favoriteHeaderElement, addedDate);
+
+	itemContainerElement.append(listHeaderContainer, favoriteIconElement);
 	favoritesList.append(itemContainerElement);
 }
 
@@ -297,7 +318,7 @@ function OpenDropDownHandler(
 		if (!target.dataset.toggled && target.dataset.toggled != "") {
 			target.setAttribute("data-toggled", "");
 			dropDownElement.style.top = `${rect.top}px`;
-			dropDownElement.style.left = `${rect.right + 25}px`;
+			dropDownElement.style.left = `${rect.right + 45}px`;
 			document
 				.querySelectorAll(".fa-ellipsis")
 				.forEach((el: HTMLElement) => {
@@ -351,7 +372,8 @@ function listsInit(tempListArr: List[]): void {
 				element.title,
 				element.description,
 				element.date,
-				element.favorite
+				element.favorite,
+				element.items
 			);
 		});
 	}
@@ -361,22 +383,12 @@ function favoritesInit(tempListArr: List[]): void {
 	favoritesList.innerHTML = "";
 	tempListArr.forEach((element) => {
 		if (element.favorite) {
-			createFavoriteElement(element.id, element.title, element.favorite);
+			createFavoriteElement(
+				element.id,
+				element.title,
+				element.favorite,
+				element.date
+			);
 		}
 	});
-}
-
-function setListId(id: number) {
-	listHeaderElement.setAttribute("data-id", id.toString());
-}
-
-function hideDropDown(): void {
-	dropDownElement.classList.add("hide");
-}
-
-function exitPopup(): void {
-	overlayElement.classList.remove("show");
-}
-function enterPopup(): void {
-	overlayElement.classList.toggle("show");
 }

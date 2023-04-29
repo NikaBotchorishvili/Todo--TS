@@ -94,22 +94,24 @@ header {
 
 .sidebar {
 	height: 100%;
-	width: 200px;
+	width: 220px;
 	box-shadow: 0px 0px 3px;
 	transition: all 0.2s ease-out;
 	color: var(--secColor);
 	position: sticky;
 	top: 0;
-	overflow-y: hidden;
+	overflow-y: scroll;
+	padding: 0 10px;
+
 }
 
 .sidebar-container {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	margin-top: 10px;
 	gap: 40px;
-	height: 100vh;
+	height: 100%;
+
 }
 
 .lists {
@@ -118,6 +120,7 @@ header {
 	flex-direction: column;
 	gap: 10px;
 	margin-top: 40px;
+
 }
 
 .lists-actions {

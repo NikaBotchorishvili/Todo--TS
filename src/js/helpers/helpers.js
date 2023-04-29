@@ -1,3 +1,7 @@
+export const $ = (selector) => document.querySelector(selector);
+const listHeaderElement = $(".list-name");
+const overlayElement = $(".overlay");
+const dropDownElement = $(".dropdown");
 export function calculateTimeSince(date) {
     const seconds = Math.floor((Date.now() - date) / 1000);
     const intervals = [
@@ -22,5 +26,16 @@ export function calculateTimeSince(date) {
 export function preUpdate(listArray) {
     window.localStorage.setItem("list", JSON.stringify(listArray));
 }
-export const $ = (selector) => document.querySelector(selector);
 export const getList = () => JSON.parse(localStorage.getItem("list"));
+export function setListId(id) {
+    listHeaderElement.setAttribute("data-id", id.toString());
+}
+export function hideDropDown() {
+    dropDownElement.classList.add("hide");
+}
+export function exitPopup() {
+    overlayElement.classList.remove("show");
+}
+export function enterPopup() {
+    overlayElement.classList.toggle("show");
+}
