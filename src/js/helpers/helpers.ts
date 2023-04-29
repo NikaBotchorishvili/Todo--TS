@@ -53,5 +53,4 @@ export function exitPopup(): void {
 }
 export function enterPopup(): void {
 	overlayElement.classList.toggle("show");
-	console.log("hgsui")
 }

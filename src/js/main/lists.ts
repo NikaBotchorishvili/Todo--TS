@@ -83,6 +83,7 @@ menuElement.addEventListener("click", () => menuElementHandler());
 
 createItemPopupButtonElement.addEventListener("click", () => {
 	createPopupElement.classList.add("slide-from-top");
+	hideDropDown();
 	enterPopup();
 });
 
