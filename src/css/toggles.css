@@ -1,5 +1,7 @@
 .show{
 	display: flex;
+	transition: all 0.3s ease-in-out;
+	top: 50%;
 }
 
 .fa-angle-left {

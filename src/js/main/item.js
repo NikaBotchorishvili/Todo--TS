@@ -67,15 +67,25 @@ function createItemElement(listProp) {
     checkBoxElement.checked = listProp.completed;
     itemContainer.classList.add("item");
     checkBoxElement.addEventListener("click", () => {
+        let listId = Number(listNameElement.dataset.id);
         let lists = JSON.parse(localStorage.getItem("list"));
-        let list = lists.find((l) => l.id = listProp.id).items;
-        console.log(listProp);
-        list = list.map((item) => {
-            if (item.id == listProp.id) {
+        let items = lists.find((l) => (l.id = listProp.id)).items;
+        items = items.map((item) => {
+            if (item.id === listProp.id) {
                 return Object.assign(Object.assign({}, item), { completed: !item.completed });
             }
             return item;
         });
+        lists = lists.map((list) => {
+            if (list.id === listId) {
+                return Object.assign(Object.assign({}, list), { items: items });
+            }
+            return { list };
+        });
+        console.log(lists);
+        console.log(items);
+        preUpdate(lists);
+        itemInit();
     });
     InfoContainer.append(checkBoxElement, itemTitle, itemDescription);
     actionContainer.append(editButton, deleteButton);
@@ -87,6 +97,7 @@ export function itemInit() {
         ? Number(listNameElement.dataset.id)
         : null;
     if (listId != null) {
+        createTaskButtonElement.classList.remove("hide");
         itemsListElement.innerHTML = "";
         let lists = JSON.parse(localStorage.getItem("list"));
         let items = lists.find((list) => list.id == listId).items;

@@ -90,17 +90,29 @@ function createItemElement(listProp: ListItem) {
 	itemContainer.classList.add("item");
 
 	checkBoxElement.addEventListener("click", () => {
+		let listId = Number(listNameElement.dataset.id);
+
 		let lists: List[] = JSON.parse(localStorage.getItem("list"));
-		
-		let list = lists.find((l) => l.id = listProp.id).items
-		console.log(listProp)
-		list = list.map((item) => {
-			if(item.id == listProp.id){
-				return {...item, completed: !item.completed}
+
+		let items = lists.find((l) => (l.id = listProp.id)).items;
+		items = items.map((item) => {
+			if (item.id === listProp.id) {
+				return { ...item, completed: !item.completed };
 			}
-			return item
-		})
-	})
+			return item;
+		});
+
+		lists = lists.map((list: List) => {
+			if (list.id === listId) {
+				return { ...list, items: items };
+			}
+			return { list };
+		});
+		console.log(lists);
+		console.log(items);
+		preUpdate(lists);
+		itemInit();
+	});
 
 	InfoContainer.append(checkBoxElement, itemTitle, itemDescription);
 	actionContainer.append(editButton, deleteButton);
@@ -114,17 +126,19 @@ export function itemInit() {
 		: null;
 
 	if (listId != null) {
-		itemsListElement.innerHTML = ""
+		createTaskButtonElement.classList.remove("hide");
+
+		itemsListElement.innerHTML = "";
 		let lists: List[] = JSON.parse(localStorage.getItem("list"));
 		let items = lists.find((list) => list.id == listId).items;
 		if (items.length > 0) {
 			items.forEach((item) => createItemElement(item));
 			counter = items.slice(-1)[0].id + 1;
 		}
-	}else{
+	} else {
 		createTaskButtonElement.classList.add("hide");
 		let userMessageElement = document.createElement("small");
-		userMessageElement.textContent = "Choose a list or create a new one"
+		userMessageElement.textContent = "Choose a list or create a new one";
 		itemsListElement.append(userMessageElement);
 	}
 }

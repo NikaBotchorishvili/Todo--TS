@@ -221,6 +221,7 @@ function createListElement(
 	const itemContainer = document.createElement("li");
 	const listHeader = document.createElement("h4");
 	const openDropDownButtonElement = document.createElement("i");
+	listHeader.classList.add("lists-list-name")
 	openDropDownButtonElement.classList.add("fa-solid", "fa-ellipsis");
 	openDropDownButtonElement.setAttribute("data-id", id.toString());
 
@@ -228,7 +229,7 @@ function createListElement(
 	listHeader.innerText = header;
 	listHeader.setAttribute("data-list-id", id.toString());
 
-	itemContainer.addEventListener("click", () => {
+	listHeader.addEventListener("click", () => {
 		setListId(id);
 		listHeaderElement.innerText = header;
 		listAddedElement.innerText = calculateTimeSince(new Date(date).getTime());
