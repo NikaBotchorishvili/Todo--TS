@@ -347,8 +347,8 @@ header {
 	padding: 20px;
 }
 
-.item-form > input,
-textarea {
+.item-title-input,
+.item-description-textarea {
 	border: none;
 }
 

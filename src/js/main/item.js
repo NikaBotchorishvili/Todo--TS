@@ -1,5 +1,5 @@
 import { preUpdate, $, getList } from "../helpers/helpers.js";
-import { checkBoxHandler, deleteHandler } from "../handlers/itemHandlers.js";
+import { checkBoxHandler, deleteHandler, editHandler } from "../handlers/itemHandlers.js";
 const itemFormElement = $(".item-form");
 const createTaskButtonElement = $(".create-task");
 const createTaskCancelButtonElement = $(".task-cancel");
@@ -73,6 +73,9 @@ function createItemElement(listProp) {
     itemContainer.append(InfoContainer, actionContainer);
     itemsListElement.append(itemContainer);
     checkBoxElement.addEventListener("click", () => checkBoxHandler(listProp.id));
+    editButton.addEventListener("click", () => {
+        editHandler(listProp.id, InfoContainer);
+    });
     deleteButton.addEventListener("click", () => {
         deleteHandler(listProp.id);
     });

@@ -1,6 +1,6 @@
 import { ListItem, List } from "../types/Types";
 import { preUpdate, $, getList } from "../helpers/helpers.js";
-import { checkBoxHandler, deleteHandler } from "../handlers/itemHandlers.js";
+import { checkBoxHandler, deleteHandler, editHandler } from "../handlers/itemHandlers.js";
 
 const itemFormElement = $(".item-form") as HTMLFormElement;
 const createTaskButtonElement = $(".create-task") as HTMLElement;
@@ -99,6 +99,10 @@ function createItemElement(listProp: ListItem) {
 	checkBoxElement.addEventListener("click", () =>
 		checkBoxHandler(listProp.id)
 	);
+
+	editButton.addEventListener("click", () => {
+		editHandler(listProp.id, InfoContainer)
+	});
 	deleteButton.addEventListener("click", () => {
 		deleteHandler(listProp.id);
 	});
